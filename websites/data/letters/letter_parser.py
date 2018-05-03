@@ -9,6 +9,9 @@ import string
 from time import time
 import sqlite3
 
+
+FRESH_READ_DATA = False
+
 sqlite_file = 'db_letters.sqlite'    # name of the sqlite database file
 table_name1 = 'ngrams'  # name of the table to be created
 
@@ -56,13 +59,12 @@ words = {
 #   READ DATASOURCES, STORE IN PYTHON DICTIONARIES   #
 ######################################################
 ######################################################
-FRESH_READ_DATA = False
 
 MAX_NGRAM_SIZE = 4
 START_YEAR = 1860
 END_YEAR = 1865
 NUM_YEARS = END_YEAR - START_YEAR + 1
-NUM_SEASONS = 12
+NUM_SEASONS = 1
 
 def count_words(words, letter_counts, date, text, ngram_size):
     # Get array-friendly version of letter date
@@ -104,7 +106,7 @@ def parse_date(s):
     if year_encoded < 0 or year_encoded > 5:
         return None, None
     month = dateutil.parser.parse(s).month-1
-    season_encoded = month;
+    season_encoded = 0 #month;
     return season_encoded, year_encoded
 
 ngrams = [] # Array of words, by ngram size, where [0] => { words } and 0 = ngram size of 1
@@ -167,31 +169,33 @@ if FRESH_READ_DATA:
 
         ngrams.append(words)
 
-    with open('ngrams_bymonth.json', 'w') as outfile:
+    with open('ngrams_byyear.json', 'w') as outfile:
         json.dump(ngrams, outfile)
-    with open('letter_counts_bymonth.json', 'w') as outfile:
+    with open('letter_counts_byyear.json', 'w') as outfile:
         json.dump(letter_counts, outfile)
     print("Done JSON dumping")
 else:
-    with open('ngrams_bymonth.json', 'r') as infile:
+    with open('ngrams_byyear.json', 'r') as infile:
         ngrams = json.load(infile)
-    with open('letter_counts_bymonth.json', 'r') as infile:
+    with open('letter_counts_byyear.json', 'r') as infile:
         letter_counts = json.load(infile)
 
 print("Time: "+str(time() - start)+" seconds")
 
 
 # Write ngrams to SQLite3 databse
-for words in ngrams:
-    for term, info in words.items():
-        print(term)
-        print(info)
-        c.execute('INSERT INTO ngrams (term) VALUES (?)', (term))
-        term_id = c.lastrowid
-        for year, year_data in enumerate(info):
-            for month, month_data in enumerate(year_data):
-                count = month_data
-                c.execute('INSERT INTO counts (id, count, month, year) VALUES (?,?,?,?)', (term_id, count, month, year))
+WRITE_TO_DB = False
+if WRITE_TO_DB:
+    for words in ngrams:
+        for term, info in words.items():
+            print(term)
+            print(info)
+            c.execute('INSERT INTO ngrams (term) VALUES (?)', (term,))
+            term_id = c.lastrowid
+            for year, year_data in enumerate(info):
+                for month, month_data in enumerate(year_data):
+                    count = month_data
+                    c.execute('INSERT INTO counts (id, count, month, year) VALUES (?,?,?,?)', (term_id, count, month, year))
 # Committing changes and closing the connection to the database file
 conn.commit()
 conn.close()

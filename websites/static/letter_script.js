@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
 	var ngrams_data = [];
-	var letters_count = [];
+	var letter_counts = [];
 	var plot_data = [];
 
 	var NGRAMS_DATA_LOADED = false;
@@ -32,12 +32,12 @@ $(document).ready(function() {
 		datatype: "JSON",
 		cache: true,
 		success: function(json) {
-			console.log("Success fetching letters_count data");
-			letters_count = json;
+			console.log("Success fetching letter_counts data");
+			letter_counts = json;
 			LETTERS_COUNT_DATA_LOADED = true;
 		},
 		error: function(xhr, text, error) {
-			console.log("Error fetching letters_count data")
+			console.log("Error fetching letter_counts data")
 			console.log(text);
 			console.log(error);
 		}
@@ -101,6 +101,29 @@ $(document).ready(function() {
 		.attr("y", -35)
 		.text("Frequency");
 
+	// draw legend
+	var legend = svg.selectAll(".plot-colorLegend")
+		.data(colorScale.domain())
+		.enter()
+		.append("g")
+		.attr("class", "plot-colorLegend")
+		.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+	// draw legend colored rectangles
+	legend.append("rect")
+		.attr("x", svg_width - 18)
+		.attr("width", 18)
+		.attr("height", 18)
+		.style("fill", colorScale);
+
+	// draw legend text
+	legend.append("text")
+		.attr("x", svg_width - 24)
+		.attr("y", 9)
+		.attr("dy", ".35em")
+		.style("text-anchor", "end")
+		.text(function(d) { return d;})
+
 	function add_plot(query) {
 		let granularity = "year";
 
@@ -108,16 +131,14 @@ $(document).ready(function() {
 		let ngram_size = words.length - 1;
 		let term = words.join();
 
-		let term_data = ngrams_data[ngram_size][term]
+		let term_data = ngrams_data[ngram_size][term];
+		console.log(term_data);
 
-		console.log(term_data)
-		var x_vals = []
-		var y_vals = []
 		if (granularity == 'year') {
-		  //   for year, year_counts in enumerate(info):
-		  //       // Mentions per letter of term: Sum up counts of term for all months of year, divide by # of letters per year
-		  //   	let frequency = np.sum(year_counts)/float(np.sum(letter_counts[year]))
-				// plot_data.append({ 'term' : query, 'year' : year, 'frequency' : ___})
+			for (var year = 0; year<term_data.length; year++) {
+				let frequency = term_data[year]/letter_counts[year];
+				plot_data.append({ 'term' : query, 'year' : year, 'frequency' : frequency });
+			}
 		}
 		else if (granularity == 'month') {
 			// Month
@@ -138,29 +159,6 @@ $(document).ready(function() {
 			.style("fill", function(d) {
 				return colorScale(d);
 			});
-
-		// draw legend
-		var legend = svg.selectAll(".plot-colorLegend")
-			.data(colorScale.domain())
-			.enter()
-			.append("g")
-			.attr("class", "plot-colorLegend")
-			.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-		// draw legend colored rectangles
-		legend.append("rect")
-			.attr("x", svg_width - 18)
-			.attr("width", 18)
-			.attr("height", 18)
-			.style("fill", colorScale);
-
-		// draw legend text
-		legend.append("text")
-			.attr("x", svg_width - 24)
-			.attr("y", 9)
-			.attr("dy", ".35em")
-			.style("text-anchor", "end")
-			.text(function(d) { return d;})
 	}
 
 });

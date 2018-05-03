@@ -17,26 +17,26 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.debug = True
 
-LETTERS_DATABASE = 'data/letters/db_letters.sqlite'
+# LETTERS_DATABASE = 'data/letters/db_letters.sqlite'
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    db.row_factory = sqlite3.Row
-    return db
+# def get_db():
+#     db = getattr(g, '_database', None)
+#     if db is None:
+#         db = g._database = sqlite3.connect(DATABASE)
+#     db.row_factory = sqlite3.Row
+#     return db
 
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if rv else None) if one else rv
+# def query_db(query, args=(), one=False):
+#     cur = get_db().execute(query, args)
+#     rv = cur.fetchall()
+#     cur.close()
+#     return (rv[0] if rv else None) if one else rv
 
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+# @app.teardown_appcontext
+# def close_connection(exception):
+#     db = getattr(g, '_database', None)
+#     if db is not None:
+#         db.close()
 
 
 
@@ -56,14 +56,13 @@ def union_recruits():
 def letters():
 	return render_template("letters.html")
 
-@app.route("/get_letters_data_ngrams", methods = ['POST'])
+@app.route("/get_letters_data_ngrams")
 def get_letters_data_ngrams():
-	cur = get_db().cursor()
 	response = send_from_directory('data/letters', 'ngrams_byyear.json')
 	response.cache_control.max_age = 30000
 	return response
 
-@app.route("/get_letters_data_letters_count", methods = ['POST'])
+@app.route("/get_letters_data_letters_count")
 def get_letters_data_letters_count():
 	response = send_from_directory('data/letters', 'letter_counts_byyear.json')
 	response.cache_control.max_age = 30000
