@@ -59,13 +59,13 @@ def letters():
 @app.route("/get_letters_data_ngrams")
 def get_letters_data_ngrams():
 	response = send_from_directory('data/letters', 'ngrams_byyear.json')
-	response.cache_control.max_age = 30000
+	response.cache_control.max_age = 300000
 	return response
 
 @app.route("/get_letters_data_letters_count")
 def get_letters_data_letters_count():
 	response = send_from_directory('data/letters', 'letter_counts_byyear.json')
-	response.cache_control.max_age = 30000
+	response.cache_control.max_age = 300000
 	return response
 
 

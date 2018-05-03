@@ -62,9 +62,9 @@ $(document).ready(function() {
 
 	// Setup X
 	var xValue = function(d) { return d.year;}, // data -> value
-		xScale = d3.scaleLinear().range([0, svg_width-60]), // value -> display
+		xScale = d3.scaleLinear().domain([1860,1865]).range([0, svg_width-80]), // value -> display
 		xMap = function(d) { return xScale(xValue(d));}, // data -> display
-		xAxis = d3.axisBottom().scale(xScale);
+		xAxis = d3.axisBottom().scale(xScale).ticks(6).tickFormat(d3.format("d"));
 
 	// Setup y
 	var yValue = function(d) { return d.frequency;}, // data -> value
@@ -80,6 +80,7 @@ $(document).ready(function() {
 
 	// X-axis
 	svg.append("g")
+		.attr("id", "letter-x-axis")
 		.attr("class", "x-axis")
 		.attr("transform", "translate(50," + (svg_height-35) + ")")
 		.call(xAxis)
@@ -91,6 +92,7 @@ $(document).ready(function() {
 
 	// Y-axis
 	svg.append("g")
+		.attr("id", "letter-y-axis")
 		.attr("class", "y-axis")
 		.attr("transform", "translate(50,5)")
 		.call(yAxis)
@@ -99,7 +101,7 @@ $(document).ready(function() {
 		.attr("transform", "rotate(-90)")
 		.attr("x", -svg_height/2 + 50)
 		.attr("y", -35)
-		.text("Frequency");
+		.text("Occurrences per letter");
 
 	// draw legend
 	var legend = svg.selectAll(".plot-colorLegend")
@@ -132,12 +134,14 @@ $(document).ready(function() {
 		let term = words.join();
 
 		let term_data = ngrams_data[ngram_size][term];
+		let term_max_freq = 0;
 		console.log(term_data);
 
 		if (granularity == 'year') {
 			for (var year = 0; year<term_data.length; year++) {
 				let frequency = term_data[year]/letter_counts[year];
-				plot_data.append({ 'term' : query, 'year' : year, 'frequency' : frequency });
+				term_max_freq = Math.max(term_max_freq, frequency);
+				plot_data.push({ 'term' : query, 'year' : year + 1860, 'frequency' : frequency });
 			}
 		}
 		else if (granularity == 'month') {
@@ -147,6 +151,12 @@ $(document).ready(function() {
 			// Season
 		}
 
+		// Readjust Y-Axis domain
+		let current_y_max = yScale.domain()[1];
+		yScale.domain([0, Math.max(current_y_max, term_max_freq)]);
+		d3.select("#letter-y-axis").call(yAxis);
+
+		console.log(plot_data);
 		// draw dots
 		svg.selectAll(".plot-dot")
 			.data(plot_data)
