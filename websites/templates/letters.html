@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card text-white bg-secondary">
+	<div class="card-header">
+		<h2>Civil War Letter Ngram Analysis</h2>
+	</div>
+	<div class="card-body">
+		<div class="row">
+			<div class="col-md-8">
+				<div id="plot-ngramdata">
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card bg-light">
+					<div class="card-header">
+						<h5>Search for Phrases</h5>
+					</div>
+					<div class="card-body">
+						<div id="phrases-container">
+							<div class="form-group">
+								<input id="phrases-search" type="text" class="form-control" placeholder="Enter a term or phrase">
+							</div>
+							<div id="phrases-terms">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="{{ url_for('static', filename='letter_script.js') }}"></script>
+
+{% endblock %}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<!-- Required meta tags -->
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<title>Data Project: Civil War</title>
+
+		<script type=text/javascript>
+			$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+		</script>
+
+		<!-- D3 -->
+		<script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+		<script src="http://d3js.org/topojson.v1.min.js"></script>
+		<script src="https://d3js.org/d3-queue.v2.min.js"></script>
+		<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+		<script src="https://d3js.org/topojson.v1.min.js"></script>
+
+		<!-- jQuery -->
+		<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+		<link href="https://bootswatch.com/4/superhero/bootstrap.min.css" rel="stylesheet">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+
+		<!-- Custom -->
+		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" >
+
+	</head>
+
+	<body>
+		<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+			<div class="container">
+				<a href="/" class="navbar-brand">Home</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<a class="nav-link" href="/union_recruits">Union Recruits</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/letters">Letters</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/modern_trends">Modern Trends</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<main role="main" class="container">
+			{% block content %}
+			{% endblock %}
+		</main>
+
+		<!--Footer-->
+		<footer id="footer" class="footer text-center bg-primary">
+			<!--Copyright-->
+			US 34 Final Project<br>
+			© 2018 Michael Wornow and Theo Walker
+			<!--/.Copyright-->
+		</footer>
+                      
+	</body>
+</html>

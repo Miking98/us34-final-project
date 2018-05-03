@@ -1,0 +1,54 @@
+body {
+	padding-top:70px;
+}
+#footer {
+	margin-top:40px;
+	padding:10px 0 10px 0;
+}
+
+.state {
+	fill: none;
+	stroke: white;
+}
+.county-hover {
+	fill: red !important;
+}
+#county-tooltip {
+	padding: 10px;
+	background-color: #000;
+	color: #FFF;
+	border-radius: 3px;
+}
+
+/* UA DATA */
+.legend-axis line {
+	stroke: white;
+}
+.legend-axis path {
+	stroke: white;
+}
+.legend-axis text {
+	fill: white;
+}
+
+
+
+/* LETTERS */
+.x-axis path, .y-axis path,
+.x-axis line, .y-axis line {
+  fill: none;
+  stroke: white;
+  shape-rendering: crispEdges;
+}
+.plot-dot {
+  stroke: #000;
+}
+.axis-label {
+	fill: white;
+	font-style:italic;
+	font-size:14px;
+}
+.x-axis .tick, .y-axis .tick {
+	fill: white;
+	stroke: white;
+}
