@@ -91,7 +91,7 @@ def get_ua_data():
 		for i in years:
 			keep_columns.append(r + '_' + str(i))
 	start = time()
-	dataset_whites = pd.read_csv('data/letters/cen_union_army_whites.csv', low_memory = True, nrows = n_rows)
+	dataset_whites = pd.read_csv('data/union/cen_union_army_whites.csv', low_memory = True, nrows = n_rows)
 	dataset_whites.drop(dataset_whites.columns.difference(keep_columns), 1, inplace=True)
 	# dataset_blacks = pd.read_csv('/Users/mwornow/Desktop/usdata/cen_all_csv/cen_expanded_usct_blacks_csv.csv', low_memory = False, nrows = n_rows)
 	# dataset_blacks.drop(dataset_blacks.columns.difference(keep_columns), 1, inplace=True)
