@@ -119,3 +119,9 @@ body {
 	background: white;
 	padding:5px;
 }
+
+
+/* MODERN TRENDS */
+.state-hover {
+	fill: yellow !important;
+}
