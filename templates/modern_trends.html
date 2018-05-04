@@ -7,7 +7,7 @@
 		<h4>Motivating Question</h4>
 	</div>
 	<div class="card-body">
-		<p>Interesting description here</p>
+		<p class="lead">What connections, if any, exist between state allegiance during the Civil War, Jim Crow segregation, political resistance to civil rights legislation, and modern day disenfranchisement of African-Americans?</p>
 	</div>
 </div>
 
@@ -18,7 +18,7 @@
 		<h2>Modern Trends</h2>
 	</div>
 	<div class="card-body">
-		<p>Selected county: <span id="selected-county"></span></p>
+		<p>Selected state: <span id="selected-state"></span></p>
 		<div class="row">
 			<div class="col-md-8">
 				<div id="map-uadata">
@@ -29,25 +29,12 @@
 			<div class="col-md-4">
 				<div class="card bg-light">
 					<div class="card-header bg-warning text-white">
-						<h5>Color Graph by County Averages</h5>
+						<h5>Change Map Year</h5>
 					</div>
 					<div class="card-body">
 						<div id="yearSlider-container">
-							<input id="yearSlider" type="range" min="1850" max="1930" value="1850" step="10"/><br>
+							<input id="yearSlider" type="range" min="0" max="3" value="0" step="1"/><br>
 							<span id="yearSlider-text">1850</span>
-						</div>
-
-						<div id="infoColoring-container">
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="infoColoring-radio" value="age" checked>
-								<label class="form-check-label">Age</label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="radio" name="infoColoring-radio" value="property">
-								<label class="form-check-label">
-								Personal property value
-								</label>
-							</div>
 						</div>
 					</div>
 				</div>

@@ -9,10 +9,10 @@ $(document).ready(function() {
 	//
 	// Datasets
 	//
-	let segregated = [ '' ]
-	let felon_disenfranchisement = ['']
-
-
+	let data = [ ['Alabama', '8.1', 'Law', '15.11', 'Yes'], ['Alaska', '19.4', 'Forbidden', '6.83', 'Yes'], ['Arizona', '5.2', 'Limited', '11.89', 'Nay'], ['Arkansas', '6.1', 'Law', '7.83', 'Nay'], ['California', '16.9', 'None', '3.41', 'Yes'], ['Colorado', '11', 'Forbidden', '3.39', 'None'], ['Connecticut', '17.9', 'Forbidden', '2.66', 'Yes'], ['Delaware', '11.2', 'Forbidden', '5.35', 'None'], ['Florida', '6.6', 'Law', '21.35', 'Nay'], ['Georgia', '5', 'Law', '6.28', 'Nay'], ['Hawaii', '22.9', 'Forbidden', '1.13', 'Yes'], ['Idaho', '5.8', 'Forbidden', '6.98', 'Yes'], ['Illinois', '15.8', 'Forbidden', '1.98', 'Yes'], ['Indiana', '9.7', 'Forbidden', '9.84', 'Yes'], ['Iowa', '8.6', 'Forbidden', '2.32', 'None'], ['Kansas', '10.1', 'Limited', '4.29', 'None'], ['Kentucky', '12.8', 'Law', '26.15', 'None'], ['Louisiana', '5.4', 'Law', '6.27', 'Nay'], ['Maine', '14', 'None', '0', 'Yes'], ['Maryland', '11.8', 'Law', '1.14', 'Yes'], ['Massachusetts', '13.3', 'Forbidden', '0.83', 'Yes'], ['Michigan', '16.8', 'Forbidden', '2.24', 'Yes'], ['Minnesota', '15.9', 'Forbidden', '7.34', 'Yes'], ['Mississippi', '7', 'Law', '15.86', 'Nay'], ['Missouri', '10.1', 'Law', '5.78', 'Nay'], ['Montana', '13.6', 'None', '4.8', 'Yes'], ['Nebraska', '9.1', 'None', '2.63', 'Yes'], ['Nevada', '14.6', 'None', '2.07', 'Split'], ['New Hampshire', '13', 'None', '5.6', 'Yes'], ['New Jersey', '17.1', 'Forbidden', '11.76', 'Yes'], ['New Mexico', '8.3', 'Limited', '1.57', 'Yes'], ['New York', '25.3', 'Forbidden', '5.28', 'None'], ['North Carolina', '4', 'Law', '4.71', 'Nay'], ['North Dakota', '6.8', 'None', '2.03', 'Yes'], ['Ohio', '13.8', 'Forbidden', '2.32', 'Yes'], ['Oklahoma', '7.1', 'Law', '6.77', 'Yes'], ['Oregon', '15.7', 'None', '2.62', 'Yes'], ['Pennsylvania', '13', 'Forbidden', '2.46', 'Yes'], ['Rhode Island', '17.2', 'Forbidden', '2.03', 'Yes'], ['South Carolina', '3.9', 'Law', '3.84', 'Nay'], ['South Dakota', '6.7', 'None', '3.9', 'Yes'], ['Tennessee', '6.4', 'Law', '21.27', 'Nay'], ['Texas', '5.8', 'Law', '6.17', 'Yes'], ['Utah', '5.4', 'None', '3.18', 'Yes'], ['Vermont', '12.1', 'None', '0', 'None'], ['Virginia', '5.8', 'Law', '21.9', 'Nay'], ['Washington', '20.2', 'Forbidden', '3.71', 'Yes'], ['West Virginia', '11.9', 'Law', '3.55', 'Split'], ['Wisconsin', '9', 'Forbidden', '8.75', 'Yes'], ['Wyoming', '6.7', 'Limited', '17.18', 'Yes'] ];
+	let confederate = [ 'Texas', 'Arkansas', 'Louisiana', 'Tennessee', 'Mississippi', 'Alabama', 'Georgia', 'Florida', 'South Carolina', 'North Carolina', 'Virginia'];
+	let border = [ 'Maryland', 'Delaware', 'West Virginia', 'Kentucky', 'Missouri'];
+	let union = [ 'Maine', 'New York', 'New Hampshire', 'Vermont', 'Massachusetts', 'Connecticut', 'Rhode Island', 'Pennsylvania', 'New Jersey', 'Ohio', 'Indiana', 'Illinois', 'Kansas', 'Michigan', 'Wisconsin', 'Minnesota', 'Iowa', 'California', 'Nevada', 'Oregon' ];
 
 	//
 	// D3
@@ -20,24 +20,11 @@ $(document).ready(function() {
 	
 
 	// Selections
+	let year_map = [ '1860', '1954', '1964', '2017']
 	d3.select("#yearSlider").on("input", function() {
-		$("#yearSlider-text").text(this.value);
-		if (UA_DATA_LOADED && D3_DATA_LOADED) {
-			draw_map();
-		}
-	});
-
-	$("#infoColoring-container input[name=infoColoring-radio]").change(function() {
-		let coloring = getSelection_infoColoring();
-		if (UA_DATA_LOADED && D3_DATA_LOADED) {
-			draw_map();
-			if (coloring == "property") {
-				d3.select("#map-uadata-legendTitle").text('Color Scale (in USD)');
-			}
-			else {
-				d3.select("#map-uadata-legendTitle").text('Color Scale (in years)');
-			}
-		}
+		let val = this.value;
+		$("#yearSlider-text").text(year_map[val]);
+		draw_map();
 	});
 
 	function yearMatch(d, i) {
@@ -52,11 +39,56 @@ $(document).ready(function() {
 	}
 
 	function getSelection_currentYear() {
-		return 6; // $("#yearSlider").val().substring(2,3); // Get the 5 in 1850 as the year number
+		return $("#yearSlider").val(); // Get the 5 in 1850 as the year number
 	}
 
-	function getSelection_infoColoring() {
-		return $("#infoColoring-container input[name=infoColoring-radio]:checked").val();
+	function color_civilWar(value) {
+		if ($.inArray(value, confederate)>=0) {
+			// Confederate
+			return "#ff0000";
+		}
+		else if ($.inArray(value, border)>=0) {
+			// Border
+			return "#6600ff";
+		}
+		else if ($.inArray(value, union)>=0) {
+			// Union
+			return "#0000ff";
+		}
+		else {
+			return "grey";
+		}
+	}
+	function color_edu(value) {
+		for (var i = 0; i<data.length; i++) {
+			let state = data[i][0];
+			if (state == value) {
+				// Found correct state
+				let edu = data[i][1];
+				if (edu == "Law") {
+					return "#ff0000";
+				}
+				else if (edu == "None") {
+					return "grey";
+				}
+				else if (edu == "Limited") {
+					return "#6600ff";
+				}
+				else if (edu == "Forbidden") {
+					return "#0000ff";
+				}
+				else {
+					return "grey";
+				}
+				break;
+			}
+		}
+	}
+	function color_civilRights(value) {
+		
+	}
+	function color_modernFelon(value) {
+		
 	}
 
 	var svg_width = 720,
@@ -97,12 +129,6 @@ $(document).ready(function() {
 
 	d3.json("https://s3.amazonaws.com/us34finalproject/us_states.json", function(us) {
 
-		// County Names
-		// var nameById = {}; // Maps: County ID -> County Name
-		// county_names.forEach(function(d) {
-		// 	nameById[d.id] = d.name;
-		// });
-
 		svg.selectAll("path")
 			.data(us.features)
 			.enter()
@@ -112,18 +138,35 @@ $(document).ready(function() {
 			.style("stroke-width", "1")
 			.style("fill", function(d) {
 				// Get data value
-				var value = d.properties.visited;
-
-				if (value) {
-					//If value exists…
-					return color(value);
+				let year = getSelection_currentYear();
+				let state = d.properties.name;
+				console.log(d.properties.name);
+				if (year == 0) {
+					// Civil War
+					return color_civilWar(state);
+				} 
+				else if (year == 1) {
+					// 1954 education
+					return color_edu(state);
+				} 
+				else if (year == 2) {
+					// 1964 civil rights bill
+					return color_civilRights(state);
+				} 
+				if (year == 3) {
+					// Modern felon disenfranchisement
+					return color_modernFelon(state);
 				} 
 				else {
-					//If value is undefined…
-					return "rgb(213,222,217)";
+					//If state is undefined…
+					return "grey";
 				}
 			});
 	});
+
+	function draw_map() {
+		svg.selectAll("")
+	}
 });
 
 function format_decimal(n) {
