@@ -4,13 +4,11 @@ import json
 import operator
 import dateutil.parser
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 import json
 import nltk
 import string
 from time import time
-import sqlite3
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
