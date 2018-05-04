@@ -42,26 +42,28 @@ $(document).ready(function() {
 		return $("#yearSlider").val(); // Get the 5 in 1850 as the year number
 	}
 	
-	var colorScale_civilWar = d3.scaleLinear()
+	var colorScale = d3.scaleLinear()
 			  .range(["#ff0000","#bf42f4","#0000ff","grey"])
 			  .domain([0,1,2,3]);
 	var colorScale_civilWar_legendText = ['Confederate', 'Border State (Union)', 'Union', 'N/A'];
 
+	var colorScale_edu_legendText = ['State-wide law', 'Local choice', 'Forbidden', 'N/A'];
+
 	function color_civilWar(value) {
 		if ($.inArray(value, confederate)>=0) {
 			// Confederate
-			return colorScale_civilWar(0);
+			return colorScale(0);
 		}
 		else if ($.inArray(value, border)>=0) {
 			// Border
-			return colorScale_civilWar(1);
+			return colorScale(1);
 		}
 		else if ($.inArray(value, union)>=0) {
 			// Union
-			return colorScale_civilWar(2);
+			return colorScale(2);
 		}
 		else {
-			return colorScale_civilWar(3);
+			return colorScale(3);
 		}
 	}
 	function color_edu(value) {
@@ -71,19 +73,19 @@ $(document).ready(function() {
 				// Found correct state
 				let val = data[i][2];
 				if (val == "Law") {
-					return "#ff0000";
-				}
-				else if (val == "None") {
-					return "grey";
+					return colorScale(0);
 				}
 				else if (val == "Limited") {
-					return "#6600ff";
+					return colorScale(1);
 				}
 				else if (val == "Forbidden") {
-					return "#0000ff";
+					return colorScale(2);
+				}
+				else if (val == "None") {
+					return colorScale(3);
 				}
 				else {
-					return "grey";
+					return colorScale(3);
 				}
 				break;
 			}
@@ -166,7 +168,7 @@ $(document).ready(function() {
     			.attr("height", 200)
     			.attr("transform", "translate(700,300)")
    				.selectAll("g")
-   				.data(colorScale_civilWar.domain().slice())
+   				.data(colorScale.domain().slice())
    				.enter()
    				.append("g")
      			.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -174,10 +176,11 @@ $(document).ready(function() {
   	legend.append("rect")
    		  .attr("width", 18)
    		  .attr("height", 18)
-   		  .style("fill", colorScale_civilWar);
+   		  .style("fill", colorScale);
 
   	legend.append("text")
-  		  .data(colorScale_civilWar_legendText)
+  			.attr("class", "modern-legend-text")
+  			.data(colorScale_civilWar_legendText)
       	  .attr("x", 24)
       	  .attr("y", 9)
       	  .attr("dy", ".35em")
@@ -217,39 +220,57 @@ $(document).ready(function() {
 					//If state is undefined…
 					return "grey";
 				}
+			})
+			.on('mouseover', function(d) {
+				d3.select("#selected-state").text(d.properties.name);
+				d3.select(this).classed("county-hover", true);
+			})
+			.on("mouseout", function(d) {
+				d3.select("#selected-state").text("");
+				d3.select(this).classed("county-hover", false);
 			});
 	});
 
 	function draw_map() {
+		let year = getSelection_currentYear();
+
+		let color_func = color_civilWar;
+		if (year == 0) {
+			// Civil War
+			color_func = color_civilWar;
+		} 
+		else if (year == 1) {
+			// 1954 education
+			color_func = color_edu;
+		} 
+		else if (year == 2) {
+			// 1964 civil rights bill
+			color_func = color_civilRights;
+		} 
+		else if (year == 3) {
+			// Modern felon disenfranchisement
+			color_func = color_modernFelon;
+		}
+
 		svg.selectAll("path")
 			.style("stroke", "#fff")
 			.style("stroke-width", "1")
 			.style("fill", function(d) {
 				// Get data value
-				let year = getSelection_currentYear();
 				let state = d.properties.name;
 				console.log(d.properties.name);
-				if (year == 0) {
-					// Civil War
-					return color_civilWar(state);
-				} 
-				else if (year == 1) {
-					// 1954 education
-					return color_edu(state);
-				} 
-				else if (year == 2) {
-					// 1964 civil rights bill
-					return color_civilRights(state);
-				} 
-				if (year == 3) {
-					// Modern felon disenfranchisement
-					return color_modernFelon(state);
-				} 
-				else {
-					//If state is undefined…
-					return "grey";
-				}
+				color_func(state);
 			});
+
+	  	legend.selectAll(".modern-legend-text")
+	  		.remove();
+
+  		legend.append("text")
+	  		.data(colorScale_edu_legendText)
+			.attr("x", 24)
+			.attr("y", 9)
+			.attr("dy", ".35em")
+			.text(function(d) { return d; });
 	}
 });
 
