@@ -82,6 +82,8 @@ body {
 #phrases-terms {
 	padding: 10px;
 	background: #fff;
+    max-height: 300px;
+    overflow-y: scroll;
 }
 .phrases-terms-empty {
 	opacity:0;
@@ -112,4 +114,8 @@ body {
 }
 .phrases-terms-query {
 	padding-left: 8px;
+}
+#phrases-search-limit {
+	background: white;
+	padding:5px;
 }

@@ -3,6 +3,8 @@ $(document).ready(function() {
 	var ngrams_data = [];
 	var letter_counts = [];
 	var plot_data = {}; // Maps term -> count, year
+	var term_colors = {}; // Maps term -> color
+	var unique_colors = [ '#00f2a3', '#6300ff', '#f2d8ff', '#f2d8ff', '#ff5f6d', '#ffc371', '#141e30', '#118c8b', '#ff67cd', '#f14d39', '#5c4a72', '#00ffff', '#e86800', '#6b0021', '#ca9785', '#a0db8e', '#008141', '#b24a59', '#925367', '#d2e8e7' ]; // List of 20 unique colors for plots
 
 	var NGRAMS_DATA_LOADED = false;
 	var LETTERS_COUNT_DATA_LOADED = false;
@@ -50,9 +52,25 @@ $(document).ready(function() {
 	// Search term on Enter press
 	$("#phrases-search").on('keypress', function(e) {
 		$('#phrases-search').popover('hide');
+		$("#phrases-search-limit").hide();
 		if (e.keyCode == 13) {
 			if ($(this).val().length > 0) {
-				add_plot($(this).val());
+				if ($(".phrases-terms-item").length <= 20) {
+					let query = $(this).val();
+					let term = query.split(" ").join();
+					if (term in plot_data) {
+						$("#phrases-search").attr('data-content', 'This term is already in the plot.');
+						$("#phrases-search").popover('show');
+						$("#phrases-search").attr('data-content', 'This term is not in the letters dataset.');
+					}
+					else {
+						add_plot(query);
+						$(this).val('');
+					}
+				}
+				else {
+					$("#phrases-search-limit").show();
+				}
 			}
 		}
 	});
@@ -66,12 +84,18 @@ $(document).ready(function() {
 		delete plot_data[term];
 		// Clear search bar
 		$("#phrases-search").val('');
+		// Hide max term error
+		$("#phrases-search-limit").hide();
 		// Update plot
 		draw_plot();
 		// Hide white space in Phrases Search bar
 		if ($(".phrases-terms-item").length == 0) {
 			$("#phrases-terms").addClass("phrases-terms-empty");
 		}
+		// Add newly freed color to available colors
+		let free_color = term_colors[term];
+		unique_colors.push(free_color);
+		delete term_colors[term];
 	});
 
 
@@ -82,8 +106,6 @@ $(document).ready(function() {
 
 	let svg_width = 720,
 	svg_height = 500;
-
-	let colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
 	// Setup X
 	var xValue = function(d) { return d.year;}, // data -> value
@@ -206,6 +228,9 @@ $(document).ready(function() {
 			.attr("cy", function(d) {
 				return yMap(d);
 			})
+			.style("fill", function(d) {
+				return uniqueColor(d.query);
+			})
 			.enter()
 			.append("circle")
 			.attr("class", "plot-dot")
@@ -217,7 +242,7 @@ $(document).ready(function() {
 				return yMap(d);
 			})
 			.style("fill", function(d) {
-				return colorScale(d.query);
+				return uniqueColor(d.query);
 			})
 			.on('mouseover', function(d) {
 				d3.select(this).classed("plot-dot-hover", true);
@@ -256,12 +281,15 @@ $(document).ready(function() {
 	    svg.selectAll(".plot-line-container").selectAll(".plot-line")
 	    	.data(lineSegments)
 	        .attr("d", dotConnectLine)
+			.style("stroke", function(d) {
+				return uniqueColor(d[0].query);
+			})
 	    	.enter()
 	    	.append("path")
 	        .attr("class", "plot-line")
 	        .attr("d", dotConnectLine)
 			.style("stroke", function(d) {
-				return colorScale(d[0].query);
+				return uniqueColor(d[0].query);
 			})
 			.style("fill", "none");
 		svg.selectAll(".plot-line-container")
@@ -280,7 +308,7 @@ $(document).ready(function() {
 		//// Add new terms
 		for (var key in plot_data) {
 			console.log(key);
-			if ($(".phrases-terms-term[value="+key+"]").length == 0) {
+			if ($(".phrases-terms-term[value='"+key+"']").length == 0) {
 				// Term not in legend, so let's add it
 				$("#phrases-terms").append(generate_legend_term_html(key));
 			}
@@ -299,6 +327,16 @@ $(document).ready(function() {
 		})
 	}
 
+	function uniqueColor(term) {
+		if (term in term_colors) {
+			return term_colors[term];
+		}
+		// This term doesn't have a color, assign it one
+		let new_color = unique_colors.pop();
+		term_colors[term] = new_color;
+		return new_color;
+	}
+
 	function lineSegments(data) {
 		segments = [];
 		for (var i = 0; i<data.length - 1; i++) {
@@ -310,7 +348,7 @@ $(document).ready(function() {
 
 	function generate_legend_term_html(term) {
 		let query = term.replace(/\,/g, ' ');
-		let color = colorScale(term);
+		let color = uniqueColor(term);
 		return '<div class="phrases-terms-item">'+
 					'<div class="phrases-terms-colorRect">'+
 						'<svg>'+
