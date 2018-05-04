@@ -16,7 +16,7 @@ $(document).ready(function() {
 	//
 	$.ajax({
 		method: "GET",
-		url: 'https://s3.amazonaws.com/us34finalproject/ngrams_byyear.json',
+		url: $SCRIPT_ROOT + '/get_ngrams_data',
 		datatype: "JSON",
 		cache: true,
 		success: function(json) {
