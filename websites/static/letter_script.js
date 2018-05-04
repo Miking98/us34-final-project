@@ -54,7 +54,21 @@ $(document).ready(function() {
 	});
 
 	// Remove term from graph
-	$(".phrases-terms-term")
+	$(document.body).on('click', '.phrases-terms-remove', function(e) {
+		let parent = $(this).parents('.phrases-terms-item');
+		let term = parent.find('.phrases-terms-term').val();
+		// Update legend
+		parent.remove();
+		delete plot_data[term];
+		// Clear search bar
+		$("#phrases-search").val('');
+		// Update plot
+		draw_plot();
+		// Hide white space in Phrases Search bar
+		if ($(".phrases-terms-item").length == 0) {
+			$("#phrases-terms").addClass("phrases-terms-empty");
+		}
+	});
 
 
 
@@ -75,7 +89,7 @@ $(document).ready(function() {
 
 	// Setup y
 	var yValue = function(d) { return d.frequency;}, // data -> value
-		yScale = d3.scaleLinear().range([svg_height-40, 5]), // value -> display
+		yScale = d3.scaleLinear().range([svg_height-40, 0]), // value -> display
 		yMap = function(d) { return yScale(yValue(d));}, // data -> display
 		yAxis = d3.axisLeft().scale(yScale);
 
@@ -143,12 +157,10 @@ $(document).ready(function() {
 			return;
 		}
 
-		var term_max_freq = 0;
 		plot_data[term] = [];
 		if (granularity == 'year') {
 			for (var year = 0; year<term_data.length; year++) {
 				let frequency = Math.round(term_data[year]/letter_counts[year] * 100)/100;
-				term_max_freq = Math.max(term_max_freq, frequency);
 				plot_data[term].push({ 'query' : query, 'year' : year + 1860, 'frequency' : frequency });
 			}
 		}
@@ -159,19 +171,25 @@ $(document).ready(function() {
 			// Season
 		}
 
-		// Readjust Y-Axis domain
-		let current_y_max = yScale.domain()[1];
-		yScale.domain([0, Math.max(current_y_max, term_max_freq + 2)]);
-		d3.select("#letter-y-axis").call(yAxis);
+		draw_plot();
+	}
 
+	function draw_plot() {
 		// Draw dots
+		var term_max_freq = 1;
 		/// Flatten plot data so not a dictionary anymore (just one array of all points clumped together)
 		var flat_plot_data = [];
 		for (var key in plot_data) {
 			data_points = plot_data[key];
 			flat_plot_data = flat_plot_data.concat(data_points);
+			// Determine range for Y-axis
+			for (var i = 0; i<data_points.length; i++) {
+				term_max_freq = Math.max(term_max_freq, data_points[i].frequency);
+			}
 		}
-
+		//// Readjust Y-Axis domain
+		yScale.domain([0, term_max_freq + (0.1*term_max_freq)]);
+		d3.select("#letter-y-axis").call(yAxis);
 		//// Draw scatter plot
 		svg.selectAll(".plot-dot")
 			.data(flat_plot_data)
@@ -203,7 +221,11 @@ $(document).ready(function() {
 				$("#letters-tooltip-freq").text("");
 				d3.select(this).classed("plot-dot-hover", false);
 				tooltip.style("visibility", "hidden");
-			});;
+			});
+		svg.selectAll(".plot-dot")
+			.data(flat_plot_data)
+			.exit()
+			.remove();
 
 		// Draw lines connecting dots
 		//// Flatten plot_data into an array containing arrays with each point for a term in a subarray only with other points for that term
@@ -228,8 +250,14 @@ $(document).ready(function() {
 				return colorScale(d[0].query);
 			})
 			.style("fill", "none");
+		svg.selectAll(".plot-line-container")
+			.data(flat_line_data)
+			.exit()
+			.remove();
 
 		// Update legend
+		//// Make background of Phrase Search white
+		$("#phrases-terms").removeClass("phrases-terms-empty");
 		//// Flatten plot_data to just keys (terms being graphed)
 		var flat_legend_data = [];
 		for (var key in plot_data) {
