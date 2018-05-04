@@ -69,9 +69,26 @@ def get_letters_data_letters_count():
 	return response
 
 
+
+
 @app.route("/modern_trends")
 def modern_trends():
 	return render_template("modern_trends.html")
+
+
+
+
+@app.route("/get_us_county_data")
+def get_us_county_data():
+	response = send_from_directory('data/union', 'us.json')
+	response.cache_control.max_age = 300000
+	return response
+
+@app.route("/get_us_county_names_data")
+def get_us_county_names_data():
+	response = send_from_directory('data/union', 'us_county_names.tsv')
+	response.cache_control.max_age = 300000
+	return response
 
 @app.route("/get_ua_data")
 def get_ua_data():

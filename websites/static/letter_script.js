@@ -7,6 +7,8 @@ $(document).ready(function() {
 	var NGRAMS_DATA_LOADED = false;
 	var LETTERS_COUNT_DATA_LOADED = false;
 
+	$("#loading-spinner").show();
+
 	//
 	// Load data
 	//
@@ -19,11 +21,13 @@ $(document).ready(function() {
 			console.log("Success fetching ngrams data");
 			ngrams_data = json;
 			NGRAMS_DATA_LOADED = true;
+			$("#loading-spinner").hide();
 		},
 		error: function(xhr, text, error) {
 			console.log("Error fetching ngrams data")
 			console.log(text);
 			console.log(error);
+			$("#loading-spinner").hide();
 		}
 	});
 	$.ajax({
@@ -176,7 +180,7 @@ $(document).ready(function() {
 
 	function draw_plot() {
 		// Draw dots
-		var term_max_freq = 1;
+		var term_max_freq = 0;
 		/// Flatten plot data so not a dictionary anymore (just one array of all points clumped together)
 		var flat_plot_data = [];
 		for (var key in plot_data) {
@@ -188,11 +192,20 @@ $(document).ready(function() {
 			}
 		}
 		//// Readjust Y-Axis domain
+		if (term_max_freq == 0) {
+			term_max_freq = 1;
+		}
 		yScale.domain([0, term_max_freq + (0.1*term_max_freq)]);
 		d3.select("#letter-y-axis").call(yAxis);
 		//// Draw scatter plot
 		svg.selectAll(".plot-dot")
 			.data(flat_plot_data)
+			.attr("cx", function(d) {
+				return xMap(d);
+			})
+			.attr("cy", function(d) {
+				return yMap(d);
+			})
 			.enter()
 			.append("circle")
 			.attr("class", "plot-dot")
@@ -238,10 +251,11 @@ $(document).ready(function() {
 			.data(flat_line_data)
 			.enter()
 			.append('g')
-			.attr('class', 'plot-line-container')
+			.attr('class', 'plot-line-container');
 
-	    lineContainers.selectAll(".plot-line")
+	    svg.selectAll(".plot-line-container").selectAll(".plot-line")
 	    	.data(lineSegments)
+	        .attr("d", dotConnectLine)
 	    	.enter()
 	    	.append("path")
 	        .attr("class", "plot-line")

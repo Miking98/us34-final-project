@@ -31,10 +31,19 @@
 
 		<!-- Custom -->
 		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" >
+		<link href="{{ url_for('static', filename='spinner.css') }}" rel="stylesheet" >
 
 	</head>
 
 	<body>
+		<div id="loading-spinner">
+			<div class="la-ball-beat la-2x">
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+			<span style="color: white;">Loading...</span>
+		</div>
 		<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
 			<div class="container">
 				<a href="/" class="navbar-brand">Home</a>

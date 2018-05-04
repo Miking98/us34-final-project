@@ -2,6 +2,22 @@ body {
 	padding-top:70px;
 	background: #f0f7ff !important;
 }
+#loading-spinner {
+	position: absolute;
+	top:30%;
+	left:45%;
+	display: none;
+    background: #4a4949;
+    z-index: 1000;
+    padding: 30px;
+    opacity: 0.9;
+    border-radius: 5px;
+}
+#loading-spinner .la-ball-atom {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+}
 #footer {
 	margin-top:40px;
 	padding:10px 0 10px 0;
