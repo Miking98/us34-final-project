@@ -53,8 +53,8 @@ $(document).ready(function() {
 		}
 	});
 
-	let svg_width = 720,
-	svg_height = 500;
+	// Remove term from graph
+	$(".phrases-terms-term")
 
 
 
@@ -62,14 +62,8 @@ $(document).ready(function() {
 	// D3 draw plot
 	//
 
-	function lineSegments(data) {
-		console.log(data);
-		segments = [];
-		for (var i = 0; i<data.length - 1; i++) {
-			segments.push([data[i], data[i+1]]) 
-		}
-		return segments;
-	}
+	let svg_width = 720,
+	svg_height = 500;
 
 	let colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -120,29 +114,6 @@ $(document).ready(function() {
 	var dotConnectLine = d3.line()
 	    .x(function(d) { return xMap(d); })
 	    .y(function(d) { return yMap(d); });
-
-	// draw legend
-	var legend = svg.selectAll(".plot-colorLegend")
-		.data(colorScale.domain())
-		.enter()
-		.append("g")
-		.attr("class", "plot-colorLegend")
-		.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-	// draw legend colored rectangles
-	legend.append("rect")
-		.attr("x", svg_width - 18)
-		.attr("width", 18)
-		.attr("height", 18)
-		.style("fill", colorScale);
-
-	// draw legend text
-	legend.append("text")
-		.attr("x", svg_width - 24)
-		.attr("y", 9)
-		.attr("dy", ".35em")
-		.style("text-anchor", "end")
-		.text(function(d) { return d;})
 
 	var tooltip = d3.select("body")
 		.append("div")
@@ -200,7 +171,7 @@ $(document).ready(function() {
 			data_points = plot_data[key];
 			flat_plot_data = flat_plot_data.concat(data_points);
 		}
-		console.log(plot_data);
+
 		//// Draw scatter plot
 		svg.selectAll(".plot-dot")
 			.data(flat_plot_data)
@@ -254,8 +225,59 @@ $(document).ready(function() {
 	        .attr("class", "plot-line")
 	        .attr("d", dotConnectLine)
 			.style("stroke", function(d) {
-				return colorScale(d.query);
+				return colorScale(d[0].query);
 			})
 			.style("fill", "none");
+
+		// Update legend
+		//// Flatten plot_data to just keys (terms being graphed)
+		var flat_legend_data = [];
+		for (var key in plot_data) {
+			flat_legend_data.push(key);
+		}
+		//// Add new terms
+		for (var key in plot_data) {
+			console.log(key);
+			if ($(".phrases-terms-term[value="+key+"]").length == 0) {
+				// Term not in legend, so let's add it
+				$("#phrases-terms").append(generate_legend_term_html(key));
+			}
+		}
+		//// Delete unused terms and update old
+		$(".phrases-terms-item").each(function(e) {
+			let term = $(this).find(".phrases-terms-term").val();
+			if (!(term in plot_data)) {
+				// Term no longer exists in plot data, so delete legend entry
+				$(this).remove();
+			}
+			else {
+				// Term is currently graphed on the plot, so update legend entry to make sure its colored correctly
+				console.log("TODO HERE");
+			}
+		})
+	}
+
+	function lineSegments(data) {
+		segments = [];
+		for (var i = 0; i<data.length - 1; i++) {
+			segments.push([data[i], data[i+1]]) 
+		}
+		return segments;
+	}
+
+
+	function generate_legend_term_html(term) {
+		let query = term.replace(/\,/g, ' ');
+		let color = colorScale(term);
+		return '<div class="phrases-terms-item">'+
+					'<div class="phrases-terms-colorRect">'+
+						'<svg>'+
+							'<rect width="25" height="25" style="fill:'+color+';"></rect>'+
+						'</svg>'+
+					'</div>'+
+					'<div class="phrases-terms-query">'+query+'</div>'+
+					'<input type="hidden" class="phrases-terms-term" value="'+term+'" />'+
+					'<button type="button" class="btn bnt-sm btn-danger phrases-terms-remove">Remove</button>'+
+				'</div>';
 	}
 });

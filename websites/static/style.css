@@ -63,3 +63,34 @@ body {
 .plot-dot-hover {
 	fill: red !important;
 }
+#phrases-terms {
+	padding: 10px;
+	background: #fff;
+}
+.phrases-terms-item:first-child {
+	border-top: 1px dashed #000;
+}
+.phrases-terms-item {
+	font-size: 16px;
+	color: #000;
+	padding-top: 5px;
+	border-bottom: 1px dashed #000;
+}
+.phrases-terms-item div {
+	display: inline-block;
+}
+.phrases-terms-item button {
+	float:right;
+	font-size: 13px;
+	padding: 2px 5px 2px 5px;
+}
+.phrases-terms-colorRect {
+	vertical-align: middle;
+}
+.phrases-terms-colorRect svg {
+	width: 25px;
+	height: 25px;
+}
+.phrases-terms-query {
+	padding-left: 8px;
+}
