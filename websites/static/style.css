@@ -1,5 +1,6 @@
 body {
 	padding-top:70px;
+	background: #f0f7ff !important;
 }
 #footer {
 	margin-top:40px;
@@ -22,33 +23,43 @@ body {
 
 /* UA DATA */
 .legend-axis line {
-	stroke: white;
+	stroke: black;
 }
 .legend-axis path {
-	stroke: white;
+	stroke: black;
 }
 .legend-axis text {
-	fill: white;
+	fill: black;
 }
 
 
 
 /* LETTERS */
+#letters-tooltip {
+	padding: 10px;
+	background-color: #000;
+	color: #FFF;
+	border-radius: 3px;
+	font-size: 12px;
+}
 .x-axis path, .y-axis path,
 .x-axis line, .y-axis line {
   fill: none;
-  stroke: white;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 .plot-dot {
   stroke: #000;
 }
 .axis-label {
-	fill: white;
+	fill: black;
 	font-style:italic;
 	font-size:14px;
 }
 .x-axis .tick, .y-axis .tick {
-	fill: white;
-	stroke: white;
+	fill: black;
+	stroke: black;
+}
+.plot-dot-hover {
+	fill: red !important;
 }

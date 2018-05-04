@@ -2,7 +2,7 @@ $(document).ready(function() {
 
 	var ngrams_data = [];
 	var letter_counts = [];
-	var plot_data = [];
+	var plot_data = {}; // Maps term -> count, year
 
 	var NGRAMS_DATA_LOADED = false;
 	var LETTERS_COUNT_DATA_LOADED = false;
@@ -45,30 +45,43 @@ $(document).ready(function() {
 
 	// Search term on Enter press
 	$("#phrases-search").on('keypress', function(e) {
+		$('#phrases-search').popover('hide');
 		if (e.keyCode == 13) {
-			add_plot($(this).val());
+			if ($(this).val().length > 0) {
+				add_plot($(this).val());
+			}
 		}
 	});
 
 	let svg_width = 720,
 	svg_height = 500;
 
-	let colorScale = d3.scaleOrdinal(d3.schemePaired);
 
 
 	//
 	// D3 draw plot
 	//
 
+	function lineSegments(data) {
+		console.log(data);
+		segments = [];
+		for (var i = 0; i<data.length - 1; i++) {
+			segments.push([data[i], data[i+1]]) 
+		}
+		return segments;
+	}
+
+	let colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
 	// Setup X
 	var xValue = function(d) { return d.year;}, // data -> value
-		xScale = d3.scaleLinear().domain([1860,1865]).range([0, svg_width-80]), // value -> display
+		xScale = d3.scaleLinear().domain([1860,1865]).range([50, svg_width-80]), // value -> display
 		xMap = function(d) { return xScale(xValue(d));}, // data -> display
 		xAxis = d3.axisBottom().scale(xScale).ticks(6).tickFormat(d3.format("d"));
 
 	// Setup y
 	var yValue = function(d) { return d.frequency;}, // data -> value
-		yScale = d3.scaleLinear().range([svg_height-40, 0]), // value -> display
+		yScale = d3.scaleLinear().range([svg_height-40, 5]), // value -> display
 		yMap = function(d) { return yScale(yValue(d));}, // data -> display
 		yAxis = d3.axisLeft().scale(yScale);
 
@@ -82,7 +95,7 @@ $(document).ready(function() {
 	svg.append("g")
 		.attr("id", "letter-x-axis")
 		.attr("class", "x-axis")
-		.attr("transform", "translate(50," + (svg_height-35) + ")")
+		.attr("transform", "translate(0," + (svg_height-35) + ")")
 		.call(xAxis)
 		.append("text")
 		.attr("class", "axis-label")
@@ -102,6 +115,11 @@ $(document).ready(function() {
 		.attr("x", -svg_height/2 + 50)
 		.attr("y", -35)
 		.text("Occurrences per letter");
+
+	// Line connecting dots
+	var dotConnectLine = d3.line()
+	    .x(function(d) { return xMap(d); })
+	    .y(function(d) { return yMap(d); });
 
 	// draw legend
 	var legend = svg.selectAll(".plot-colorLegend")
@@ -126,6 +144,19 @@ $(document).ready(function() {
 		.style("text-anchor", "end")
 		.text(function(d) { return d;})
 
+	var tooltip = d3.select("body")
+		.append("div")
+		.style("position", "absolute")
+		.style("z-index", "10")
+		.style("visibility", "hidden")
+		.html(function() {
+			return '<div id="letters-tooltip">'+	
+						'Term: <span id="letters-tooltip-term"></span><br>'+
+						'Frequency: <span id="letters-tooltip-freq">N/A</span><br>'+
+						'Year: <span id="letters-tooltip-year">N/A</span>'+
+					'</div>';
+		});
+
 	function add_plot(query) {
 		let granularity = "year";
 
@@ -134,14 +165,20 @@ $(document).ready(function() {
 		let term = words.join();
 
 		let term_data = ngrams_data[ngram_size][term];
-		let term_max_freq = 0;
-		console.log(term_data);
 
+		// Make sure term exists in dataset
+		if (term_data == null) {
+			$('#phrases-search').popover('show');
+			return;
+		}
+
+		var term_max_freq = 0;
+		plot_data[term] = [];
 		if (granularity == 'year') {
 			for (var year = 0; year<term_data.length; year++) {
-				let frequency = term_data[year]/letter_counts[year];
+				let frequency = Math.round(term_data[year]/letter_counts[year] * 100)/100;
 				term_max_freq = Math.max(term_max_freq, frequency);
-				plot_data.push({ 'term' : query, 'year' : year + 1860, 'frequency' : frequency });
+				plot_data[term].push({ 'query' : query, 'year' : year + 1860, 'frequency' : frequency });
 			}
 		}
 		else if (granularity == 'month') {
@@ -153,22 +190,72 @@ $(document).ready(function() {
 
 		// Readjust Y-Axis domain
 		let current_y_max = yScale.domain()[1];
-		yScale.domain([0, Math.max(current_y_max, term_max_freq)]);
+		yScale.domain([0, Math.max(current_y_max, term_max_freq + 2)]);
 		d3.select("#letter-y-axis").call(yAxis);
 
+		// Draw dots
+		/// Flatten plot data so not a dictionary anymore (just one array of all points clumped together)
+		var flat_plot_data = [];
+		for (var key in plot_data) {
+			data_points = plot_data[key];
+			flat_plot_data = flat_plot_data.concat(data_points);
+		}
 		console.log(plot_data);
-		// draw dots
+		//// Draw scatter plot
 		svg.selectAll(".plot-dot")
-			.data(plot_data)
+			.data(flat_plot_data)
 			.enter()
 			.append("circle")
 			.attr("class", "plot-dot")
 			.attr("r", 3.5)
-			.attr("cx", xMap)
-			.attr("cy", yMap)
+			.attr("cx", function(d) {
+				return xMap(d);
+			})
+			.attr("cy", function(d) {
+				return yMap(d);
+			})
 			.style("fill", function(d) {
-				return colorScale(d);
-			});
-	}
+				return colorScale(d.query);
+			})
+			.on('mouseover', function(d) {
+				d3.select(this).classed("plot-dot-hover", true);
+				$("#letters-tooltip-term").text(d.query);
+				$("#letters-tooltip-year").text(d.year);
+				$("#letters-tooltip-freq").text(d.frequency);
+				tooltip.style("visibility", "visible");
+			})
+			.on("mousemove", function(d) {
+				tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+			})
+			.on("mouseout", function(d) {
+				$("#letters-tooltip-year").text("");
+				$("#letters-tooltip-freq").text("");
+				d3.select(this).classed("plot-dot-hover", false);
+				tooltip.style("visibility", "hidden");
+			});;
 
+		// Draw lines connecting dots
+		//// Flatten plot_data into an array containing arrays with each point for a term in a subarray only with other points for that term
+		var flat_line_data = [];
+		for (var key in plot_data) {
+			data_points = plot_data[key];
+			flat_line_data.push(data_points);
+		}
+		var lineContainers = svg.selectAll(".plot-line-container")
+			.data(flat_line_data)
+			.enter()
+			.append('g')
+			.attr('class', 'plot-line-container')
+
+	    lineContainers.selectAll(".plot-line")
+	    	.data(lineSegments)
+	    	.enter()
+	    	.append("path")
+	        .attr("class", "plot-line")
+	        .attr("d", dotConnectLine)
+			.style("stroke", function(d) {
+				return colorScale(d.query);
+			})
+			.style("fill", "none");
+	}
 });

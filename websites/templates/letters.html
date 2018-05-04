@@ -2,9 +2,9 @@
 
 {% block content %}
 
-<div class="card text-white bg-secondary">
-	<div class="card-header">
-		<h2>Civil War Letter Ngram Analysis</h2>
+<div class="card border-success">
+	<div class="card-header bg-success text-white">
+		<h2>Civil War Letters Ngram Analysis</h2>
 	</div>
 	<div class="card-body">
 		<div class="row">
@@ -13,14 +13,14 @@
 				</div>
 			</div>
 			<div class="col-md-4">
-				<div class="card bg-light">
+				<div class="card bg-warning text-white">
 					<div class="card-header">
 						<h5>Search for Phrases</h5>
 					</div>
 					<div class="card-body">
 						<div id="phrases-container">
 							<div class="form-group">
-								<input id="phrases-search" type="text" class="form-control" placeholder="Enter a term or phrase">
+								<input id="phrases-search" type="text" class="form-control" placeholder="Enter a term or phrase" data-toggle="popover" data-placement="bottom" data-content="This phrase is not in the letters dataset.">
 							</div>
 							<div id="phrases-terms">
 							</div>
