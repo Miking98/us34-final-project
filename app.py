@@ -57,7 +57,7 @@ def union_recruits():
 
 
 @app.route("/get_ngrams_data")
-def get_ua_data():
+def get_ngrams_data():
 	response = send_from_directory('data/letters', 'ngrams_byyear_max_2.json')
 	response.cache_control.max_age = 300000
 	return response
