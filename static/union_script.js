@@ -158,12 +158,6 @@ $(document).ready(function() {
 	
 
 	// Selections
-	d3.select("#yearSlider").on("input", function() {
-		$("#yearSlider-text").text(this.value);
-		if (UA_DATA_LOADED && D3_DATA_LOADED) {
-			draw_map();
-		}
-	});
 
 	$("#infoColoring-container input[name=infoColoring-radio]").change(function() {
 		let coloring = getSelection_infoColoring();

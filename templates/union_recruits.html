@@ -32,11 +32,6 @@
 						<h5>Color Graph by County Averages</h5>
 					</div>
 					<div class="card-body">
-						<div id="yearSlider-container">
-							<input id="yearSlider" type="range" min="1850" max="1930" value="1850" step="10"/><br>
-							<span id="yearSlider-text">1850</span>
-						</div>
-
 						<div id="infoColoring-container">
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="infoColoring-radio" value="age" checked>
@@ -63,7 +58,8 @@
 		<h4>Description of Dataset</h4>
 	</div>
 	<div class="card-body">
-		<p>Interesting description here</p>
+		<p>The dataset that we used for this visual comes from the <a href="http://uadata.org/">Union Army Dataset</a>. The dataset is a sample of 39,000 white Union army veterans and contains (where applicable) each soldier's complete Census record from 1850-1940. It also contains information on each recruits geographic residence, which we used to aggregate records by county and then display average recruit information in the above graph.</p>
+		<p>A challenge with this dataset was its sparsity -- although there were dozens of variables to consider for each soldier across almost a century, most of the Census records were blank or contained mal-formed data. In fact, the only two variables that ended up being consistently reported across soldiers were the Age and Personal Property data points, which we've shown on the graph above.</p>
 	</div>
 </div>
 

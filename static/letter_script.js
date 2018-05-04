@@ -60,7 +60,7 @@ $(document).ready(function() {
 			if ($(this).val().length > 0) {
 				if ($(".phrases-terms-item").length <= 20) {
 					let query = $(this).val();
-					let words = query.split(" ");
+					let words = query.toLowerCase().split(" ");
 					let ngram_size = words.length;
 					let term = words.join();
 					if (ngram_size > 2) {
@@ -79,7 +79,7 @@ $(document).ready(function() {
 							$('#phrases-search').popover('show');
 						}
 						else {
-							add_plot(term, term_data);
+							add_plot(term, term_data, query);
 							$(this).val('');
 						}
 					}
@@ -184,8 +184,7 @@ $(document).ready(function() {
 					'</div>';
 		});
 
-	function add_plot(term, term_data) {
-		let query = term.replace(',', ' ')
+	function add_plot(term, term_data, query) {
 		let granularity = "year";
 
 		plot_data[term] = [];

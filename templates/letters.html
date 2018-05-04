@@ -51,7 +51,16 @@
 		<h4>Description of Dataset</h4>
 	</div>
 	<div class="card-body">
-		<p>Interesting description here</p>
+		<p>The key to this visual was finding a large dataset of letters written between 1860-65 by American citizens. The letters needed to be both transcribed into machine readable format (i.e. literal text rather than scanned images) and marked with a date so that we could plot the frequency of certain phrases over time.</p>
+		<p>We needed to compile multiple different databases in order to get enough letters so that we had enough data points to ground our analysis. For our visual, we ended up combining the following three archives of Civil War letters:
+		<ul>
+			<li><a href="http://www.soldierstudies.org/">Civil War Voices</a></li>
+			<li><a href="https://cwld.alexanderstreet.com/">The American Civil War: Letters and Diaries</a></li>
+			<li><a href="https://ehistory.osu.edu/books/official-records">The War of the Rebellion: Official Records of the Civil War</a></li>
+		</ul>
+		<p>Because none of these archives had a centralized repository of letters, however, we first needed to write several Python scripts to scrape each website, download, and properly format each letter with the metadata that we needed.</p>
+		<p>After we compiled all of the data into a standardized, machine-readable format, we then tokenized each letter with the <code>nltk</code> software package and stored the count of every ngram of size 1 and 2 found in the dataset. We then send these counts to the browser in a large JSON file, allowing the user to instantly search for any one-word or two-word phrase and plot the change in that phrase's frequency over time.</p>
+		<p>An issue that we quickly ran into was the fact that certain years had more letters than other years. If we simply counted the number of occurences of a phrase for each year and then plotted the results on the graph, this would obviously skew our results, for years with more letters written during them would naturally have more occurences of that phrase in absolute terms. Thus, to control for the different number of letters written each year, instead of counting the total number of occurences of a phrase and plotting that on the Y-Axis for each year, we calculated the percentage of letters that each phrase occured in.</p>
 	</div>
 </div>
 
