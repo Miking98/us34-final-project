@@ -10,7 +10,6 @@ from time import time
 import sqlite3
 
 
-FRESH_READ_DATA = False
 
 sqlite_file = 'db_letters.sqlite'    # name of the sqlite database file
 table_name1 = 'ngrams'  # name of the table to be created
@@ -60,7 +59,9 @@ words = {
 ######################################################
 ######################################################
 
-MAX_NGRAM_SIZE = 4
+FRESH_READ_DATA = True
+
+MAX_NGRAM_SIZE = 2
 START_YEAR = 1860
 END_YEAR = 1865
 NUM_YEARS = END_YEAR - START_YEAR + 1
@@ -118,7 +119,7 @@ if FRESH_READ_DATA:
     dataset_theo = pd.read_csv('theo.csv').to_dict('records')
     dataset_theo_2 = pd.read_csv('theo2.csv').to_dict('records')
 
-    for ngram_size in range(1, MAX_NGRAM_SIZE):
+    for ngram_size in range(1, MAX_NGRAM_SIZE+1):
         words = {} # Maps strings => Array of years (1860-65), where each index is an Array of seasons (0-11), and each index number of occurences of that string in letters written that year
 
         letter_counts = [ [ 0 for _ in range(NUM_SEASONS) ] for _ in range(NUM_YEARS) ]
@@ -169,19 +170,31 @@ if FRESH_READ_DATA:
 
         ngrams.append(words)
 
-    with open('ngrams_byyear.json', 'w') as outfile:
+    with open('ngrams_byyear_max_2.json', 'w') as outfile:
         json.dump(ngrams, outfile)
-    with open('letter_counts_byyear.json', 'w') as outfile:
+    with open('letter_counts_byyear_max_2.json', 'w') as outfile:
         json.dump(letter_counts, outfile)
     print("Done JSON dumping")
 else:
-    with open('ngrams_byyear.json', 'r') as infile:
+    with open('ngrams_byyear_max_2.json', 'r') as infile:
         ngrams = json.load(infile)
-    with open('letter_counts_byyear.json', 'r') as infile:
+    with open('letter_counts_byyear_max_2.json', 'r') as infile:
         letter_counts = json.load(infile)
+
+print("DONE READING")
+
+WRITE_TO_CSV = True
+if WRITE_TO_CSV:
+    with open('ngrams_byyear_max_2.csv', 'w') as outfile:
+        outfile.write('term' + "," + 'year_0' + "," + 'year_1' + "," + 'year_2' + "," + 'year_3' + "," + 'year_4' + "," + 'year_5\n')
+        for words in ngrams:
+            for term, info in words.items():
+                outfile.write(term.replace(',','-') + "," + str(info[0][0]) + "," + str(info[1][0]) + "," + str(info[2][0]) + "," + str(info[3][0]) + "," + str(info[4][0]) + "," + str(info[5][0])+'\n')
+    outfile.close()
 
 print("Time: "+str(time() - start)+" seconds")
 
+exit()
 
 # Write ngrams to SQLite3 databse
 WRITE_TO_DB = False

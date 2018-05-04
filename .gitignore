@@ -1,2 +1,9 @@
-ngrams_byyear.json
+*.json
 *.axt
+*.tsv
+*.csv
+
+!ua_data.json
+!us_county_names.tsv
+!us.json
+!ngrams_byyear_max_2.json

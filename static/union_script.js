@@ -107,7 +107,7 @@ $(document).ready(function() {
 				}
 			});
 			for (var year in averagePersonalProperty) {
-				averagePersonalProperty[year] = averagePersonalProperty[year]/averagePersonalPropertyCount[year];
+				averagePersonalProperty[year] = averagePersonalPropertyCount[year]>0 ? averagePersonalProperty[year]/averagePersonalPropertyCount[year] : null;
 			}
 			var averageBirthYear = totalBirthYearCount > 0 ? parseInt(totalBirthYear/totalBirthYearCount) : null;
 

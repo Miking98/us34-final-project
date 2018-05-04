@@ -44,12 +44,23 @@ def hello():
 
 
 
+@app.route("/get_ua_data")
+def get_ua_data():
+	response = send_from_directory('data/union', 'ua_data.json')
+	response.cache_control.max_age = 300000
+	return response
+
 @app.route("/union_recruits")
 def union_recruits():
 	return render_template("union_recruits.html")
 
 
 
+@app.route("/get_ngrams_data")
+def get_ua_data():
+	response = send_from_directory('data/letters', 'ngrams_byyear_max_2.json')
+	response.cache_control.max_age = 300000
+	return response
 @app.route("/letters")
 def letters():
 	return render_template("letters.html")
@@ -64,11 +75,6 @@ def modern_trends():
 
 
 
-@app.route("/get_ua_data")
-def get_ua_data():
-	response = send_from_directory('data/union', 'ua_data.json')
-	response.cache_control.max_age = 300000
-	return response
 	
 
 
