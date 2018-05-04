@@ -24,12 +24,14 @@ $(document).ready(function() {
 			ngrams_data = json;
 			NGRAMS_DATA_LOADED = true;
 			$("#loading-spinner").hide();
+			$("#phrases-search").focus();
 		},
 		error: function(xhr, text, error) {
 			console.log("Error fetching ngrams data")
 			console.log(text);
 			console.log(error);
 			$("#loading-spinner").hide();
+			$("#phrases-search").focus();
 		}
 	});
 	$.ajax({
@@ -52,20 +54,34 @@ $(document).ready(function() {
 	// Search term on Enter press
 	$("#phrases-search").on('keypress', function(e) {
 		$('#phrases-search').popover('hide');
+		$("#phrases-search").attr('data-content', 'This term is not in the letters dataset.');
 		$("#phrases-search-limit").hide();
 		if (e.keyCode == 13) {
 			if ($(this).val().length > 0) {
 				if ($(".phrases-terms-item").length <= 20) {
 					let query = $(this).val();
-					let term = query.split(" ").join();
-					if (term in plot_data) {
+					let words = query.split(" ");
+					let ngram_size = words.length;
+					let term = words.join();
+					if (ngram_size > 2) {
+						$("#phrases-search").attr('data-content', 'A max of two words per phrase is allowed.');
+						$("#phrases-search").popover('show');
+					}
+					else if (term in plot_data) {
 						$("#phrases-search").attr('data-content', 'This term is already in the plot.');
 						$("#phrases-search").popover('show');
-						$("#phrases-search").attr('data-content', 'This term is not in the letters dataset.');
 					}
 					else {
-						add_plot(query);
-						$(this).val('');
+						let term_data = ngrams_data[ngram_size-1][term];
+
+						// Make sure term exists in dataset
+						if (term_data == null) {
+							$('#phrases-search').popover('show');
+						}
+						else {
+							add_plot(term, term_data);
+							$(this).val('');
+						}
 					}
 				}
 				else {
@@ -153,7 +169,7 @@ $(document).ready(function() {
 	// Line connecting dots
 	var dotConnectLine = d3.line()
 	    .x(function(d) { return xMap(d); })
-	    .y(function(d) { return yMap(d); });
+	    .y(function(d) { return yMap(d)+5; });
 
 	var tooltip = d3.select("body")
 		.append("div")
@@ -168,20 +184,9 @@ $(document).ready(function() {
 					'</div>';
 		});
 
-	function add_plot(query) {
+	function add_plot(term, term_data) {
+		let query = term.replace(',', ' ')
 		let granularity = "year";
-
-		let words = query.split(" ");
-		let ngram_size = words.length - 1;
-		let term = words.join();
-
-		let term_data = ngrams_data[ngram_size][term];
-
-		// Make sure term exists in dataset
-		if (term_data == null) {
-			$('#phrases-search').popover('show');
-			return;
-		}
 
 		plot_data[term] = [];
 		if (granularity == 'year') {
@@ -226,7 +231,7 @@ $(document).ready(function() {
 				return xMap(d);
 			})
 			.attr("cy", function(d) {
-				return yMap(d);
+				return yMap(d)+5;
 			})
 			.style("fill", function(d) {
 				return uniqueColor(d.query);
@@ -239,7 +244,7 @@ $(document).ready(function() {
 				return xMap(d);
 			})
 			.attr("cy", function(d) {
-				return yMap(d);
+				return yMap(d)+5;
 			})
 			.style("fill", function(d) {
 				return uniqueColor(d.query);
