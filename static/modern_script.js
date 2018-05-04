@@ -12,7 +12,7 @@ $(document).ready(function() {
 	//
 	// Load data
 	//
-	 $.ajax({
+	$.ajax({
 		method: "GET",
 		url: $SCRIPT_ROOT + "/get_ua_data",
 		datatype: "JSON",
@@ -155,11 +155,9 @@ $(document).ready(function() {
 	//
 	// D3
 	//
+	
 
-
-
-	var inputValue = null;
-
+	// Selections
 	d3.select("#yearSlider").on("input", function() {
 		$("#yearSlider-text").text(this.value);
 		if (UA_DATA_LOADED && D3_DATA_LOADED) {
@@ -168,10 +166,17 @@ $(document).ready(function() {
 	});
 
 	$("#infoColoring-container input[name=infoColoring-radio]").change(function() {
+		let coloring = getSelection_infoColoring();
 		if (UA_DATA_LOADED && D3_DATA_LOADED) {
 			draw_map();
+			if (coloring == "property") {
+				d3.select("#map-uadata-legendTitle").text('Color Scale (in USD)');
+			}
+			else {
+				d3.select("#map-uadata-legendTitle").text('Color Scale (in years)');
+			}
 		}
-	})
+	});
 
 	function yearMatch(d, i) {
 		// var m = month[d.id];
@@ -193,12 +198,10 @@ $(document).ready(function() {
 	}
 
 	var svg_width = 720,
-	svg_height = 400;
+	svg_height = 500;
 
-	var projection = d3.geoMercator()
-		.center([0, 42])
-		.rotate([80, 0])
-		.scale(1240)
+	var projection = d3.geoAlbers()
+		.scale(1000)
 		.translate([svg_width / 2, svg_height / 2]);
 
 	var path = d3.geoPath()
@@ -239,11 +242,12 @@ $(document).ready(function() {
 	//Append title
 	mapColorLegend.append("text")
 		.attr("id", "map-uadata-legendTitle")
-		.attr("x", 80)
+		.attr("x", 50)
 		.attr("y", 5)
-		.style("fill", "white")
+		.style("fill", "black")
 		.style("font-style", "italic")
-		.text("Color Scale");
+		.style("font-size", "14px")
+		.text("Color Scale (in years)");
 
 	//Set scale for x-axis
 	var mapColorLegendScaleX = d3.scaleLinear()
@@ -284,8 +288,8 @@ $(document).ready(function() {
 
 	// Queue up datasets using d3 Queue
 	d3.queue()
-	    .defer(d3.json, "http://duspviz.mit.edu/_assets/data/us.json") // Load US Counties
-		.defer(d3.tsv, "https://gist.githubusercontent.com/mbostock/4090846/raw/07e73f3c2d21558489604a0bc434b3a5cf41a867/us-county-names.tsv")
+	    .defer(d3.json, "https://s3.amazonaws.com/us34finalproject/us.json") // Load US Counties
+		.defer(d3.tsv, "https://s3.amazonaws.com/us34finalproject/us_county_names.tsv")
 	    .await(ready); // Run 'ready' when JSONs are loaded
 
 	 // Ready Function, runs when D3 data is loaded

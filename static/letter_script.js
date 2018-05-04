@@ -16,7 +16,7 @@ $(document).ready(function() {
 	//
 	$.ajax({
 		method: "GET",
-		url: $SCRIPT_ROOT + "/get_letters_data_ngrams",
+		url: 'https://s3.amazonaws.com/us34finalproject/ngrams_byyear.json',
 		datatype: "JSON",
 		cache: true,
 		success: function(json) {
@@ -34,7 +34,7 @@ $(document).ready(function() {
 	});
 	$.ajax({
 		method: "GET",
-		url: $SCRIPT_ROOT + "/get_letters_data_letters_count",
+		url: 'https://s3.amazonaws.com/us34finalproject/letter_counts_byyear.json',
 		datatype: "JSON",
 		cache: true,
 		success: function(json) {

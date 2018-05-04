@@ -54,18 +54,6 @@ def union_recruits():
 def letters():
 	return render_template("letters.html")
 
-@app.route("/get_letters_data_ngrams")
-def get_letters_data_ngrams():
-	response = send_from_directory('data/letters', 'ngrams_byyear.json')
-	response.cache_control.max_age = 300000
-	return response
-
-@app.route("/get_letters_data_letters_count")
-def get_letters_data_letters_count():
-	response = send_from_directory('data/letters', 'letter_counts_byyear.json')
-	response.cache_control.max_age = 300000
-	return response
-
 
 
 
@@ -75,18 +63,6 @@ def modern_trends():
 
 
 
-
-@app.route("/get_us_county_data")
-def get_us_county_data():
-	response = send_from_directory('data/union', 'us.json')
-	response.cache_control.max_age = 300000
-	return response
-
-@app.route("/get_us_county_names_data")
-def get_us_county_names_data():
-	response = send_from_directory('data/union', 'us_county_names.tsv')
-	response.cache_control.max_age = 300000
-	return response
 
 @app.route("/get_ua_data")
 def get_ua_data():
@@ -115,7 +91,7 @@ def get_ua_data():
 		for i in years:
 			keep_columns.append(r + '_' + str(i))
 	start = time()
-	dataset_whites = pd.read_csv('/Users/mwornow/Desktop/usdata/cen_all_csv/cen_union_army_whites.csv', low_memory = False, nrows = n_rows)
+	dataset_whites = pd.read_csv('https://s3.amazonaws.com/us34finalproject/cen_union_army_whites.csv', low_memory = False, nrows = n_rows)
 	dataset_whites.drop(dataset_whites.columns.difference(keep_columns), 1, inplace=True)
 	# dataset_blacks = pd.read_csv('/Users/mwornow/Desktop/usdata/cen_all_csv/cen_expanded_usct_blacks_csv.csv', low_memory = False, nrows = n_rows)
 	# dataset_blacks.drop(dataset_blacks.columns.difference(keep_columns), 1, inplace=True)

@@ -290,8 +290,8 @@ $(document).ready(function() {
 
 	// Queue up datasets using d3 Queue
 	d3.queue()
-	    .defer(d3.json, "/get_us_county_data") // Load US Counties
-		.defer(d3.tsv, "/get_us_county_names_data")
+	    .defer(d3.json, "https://s3.amazonaws.com/us34finalproject/us.json") // Load US Counties
+		.defer(d3.tsv, "https://s3.amazonaws.com/us34finalproject/us_county_names.tsv")
 	    .await(ready); // Run 'ready' when JSONs are loaded
 
 	 // Ready Function, runs when D3 data is loaded
