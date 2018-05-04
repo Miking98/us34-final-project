@@ -22,7 +22,7 @@ $(document).ready(function() {
 	// Selections
 	let year_map = [ '1860', '1954', '1964', '2017']
 	d3.select("#yearSlider").on("input", function() {
-		let val = this.value;
+		let val = +this.value;
 		$("#yearSlider-text").text(year_map[val]);
 		draw_map();
 	});
@@ -41,22 +41,27 @@ $(document).ready(function() {
 	function getSelection_currentYear() {
 		return $("#yearSlider").val(); // Get the 5 in 1850 as the year number
 	}
+	
+	var colorScale_civilWar = d3.scaleLinear()
+			  .range(["#ff0000","#bf42f4","#0000ff","grey"])
+			  .domain([0,1,2,3]);
+	var colorScale_civilWar_legendText = ['Confederate', 'Border State (Union)', 'Union', 'N/A'];
 
 	function color_civilWar(value) {
 		if ($.inArray(value, confederate)>=0) {
 			// Confederate
-			return "#ff0000";
+			return colorScale_civilWar(0);
 		}
 		else if ($.inArray(value, border)>=0) {
 			// Border
-			return "#6600ff";
+			return colorScale_civilWar(1);
 		}
 		else if ($.inArray(value, union)>=0) {
 			// Union
-			return "#0000ff";
+			return colorScale_civilWar(2);
 		}
 		else {
-			return "grey";
+			return colorScale_civilWar(3);
 		}
 	}
 	function color_edu(value) {
@@ -64,17 +69,17 @@ $(document).ready(function() {
 			let state = data[i][0];
 			if (state == value) {
 				// Found correct state
-				let edu = data[i][1];
-				if (edu == "Law") {
+				let val = data[i][2];
+				if (val == "Law") {
 					return "#ff0000";
 				}
-				else if (edu == "None") {
+				else if (val == "None") {
 					return "grey";
 				}
-				else if (edu == "Limited") {
+				else if (val == "Limited") {
 					return "#6600ff";
 				}
-				else if (edu == "Forbidden") {
+				else if (val == "Forbidden") {
 					return "#0000ff";
 				}
 				else {
@@ -85,9 +90,37 @@ $(document).ready(function() {
 		}
 	}
 	function color_civilRights(value) {
-		
+		for (var i = 0; i<data.length; i++) {
+			let state = data[i][0];
+			if (state == value) {
+				// Found correct state
+				let val = data[i][4];
+				if (val == "Nay") {
+					return "#ff0000";
+				}
+				else if (val == "Yes") {
+					return "#0000ff";
+				}
+				else if (val == "None") {
+					return "grey";
+				}
+				else {
+					return "grey";
+				}
+				break;
+			}
+		}
 	}
 	function color_modernFelon(value) {
+		for (var i = 0; i<data.length; i++) {
+			let state = data[i][0];
+			if (state == value) {
+				// Found correct state
+				let val = data[i][3];
+				colorScale()
+				break;
+			}
+		}
 		
 	}
 
@@ -102,7 +135,7 @@ $(document).ready(function() {
 		.projection(projection);
 
 	var svg = d3.select("#map-uadata").append("svg")
-		.attr("width", svg_width)
+		.attr("width", svg_width + 200)
 		.attr("height", svg_height);
 
 	var g = svg.append("g")
@@ -126,6 +159,29 @@ $(document).ready(function() {
 						'</div>'+
 					'</div>';
 		});
+
+	var legend = svg.append("g")
+      			.attr("class", "legend")
+     			.attr("width", 140)
+    			.attr("height", 200)
+    			.attr("transform", "translate(700,300)")
+   				.selectAll("g")
+   				.data(colorScale_civilWar.domain().slice())
+   				.enter()
+   				.append("g")
+     			.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  	legend.append("rect")
+   		  .attr("width", 18)
+   		  .attr("height", 18)
+   		  .style("fill", colorScale_civilWar);
+
+  	legend.append("text")
+  		  .data(colorScale_civilWar_legendText)
+      	  .attr("x", 24)
+      	  .attr("y", 9)
+      	  .attr("dy", ".35em")
+      	  .text(function(d) { return d; });
 
 	d3.json("https://s3.amazonaws.com/us34finalproject/us_states.json", function(us) {
 
@@ -165,7 +221,35 @@ $(document).ready(function() {
 	});
 
 	function draw_map() {
-		svg.selectAll("")
+		svg.selectAll("path")
+			.style("stroke", "#fff")
+			.style("stroke-width", "1")
+			.style("fill", function(d) {
+				// Get data value
+				let year = getSelection_currentYear();
+				let state = d.properties.name;
+				console.log(d.properties.name);
+				if (year == 0) {
+					// Civil War
+					return color_civilWar(state);
+				} 
+				else if (year == 1) {
+					// 1954 education
+					return color_edu(state);
+				} 
+				else if (year == 2) {
+					// 1964 civil rights bill
+					return color_civilRights(state);
+				} 
+				if (year == 3) {
+					// Modern felon disenfranchisement
+					return color_modernFelon(state);
+				} 
+				else {
+					//If state is undefined…
+					return "grey";
+				}
+			});
 	}
 });
 
