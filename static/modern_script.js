@@ -69,6 +69,9 @@ $(document).ready(function() {
 				// Union
 				return "union";
 			}
+			else {
+				return "none";
+			}
 		}
 		for (var i = 0; i<data.length; i++) {
 			let value = data[i][0];
