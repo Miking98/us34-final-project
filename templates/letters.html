@@ -29,14 +29,23 @@
 						<h5>Search for Phrases</h5>
 					</div>
 					<div class="card-body">
+
 						<div id="phrases-container">
 							<div class="form-group">
-								<input id="phrases-search" type="text" class="form-control" placeholder="Enter a term or phrase" data-toggle="popover" data-placement="bottom" data-content="This term is not in the letters dataset.">
+								<div class="input-group">
+									<input id="phrases-search" type="text" class="form-control" placeholder="Enter a term or phrase" data-toggle="popover" data-placement="bottom" data-content="This term is not in the letters dataset.">
+									<div class="input-group-append">
+										<button id="phrases-search-goButton" class="btn btn-success" type="button">Go</button>
+									</div>
+								</div>
 							</div>
-							<p id="phrases-search-limit" style="display: none;" class="text-danger">ERROR: Max of 20 search terms allowed</div>
+
+							<p id="phrases-search-limit" style="display: none;" class="text-danger">ERROR: Max of 20 search terms allowed</p>
+
 							<div id="phrases-terms" class="phrases-terms-empty">
 							</div>
 						</div>
+						
 					</div>
 				</div>
 			</div>

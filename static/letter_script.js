@@ -51,6 +51,13 @@ $(document).ready(function() {
 		}
 	}); 
 
+	// Go button clicked
+	$("#phrases-search-goButton").click(function() {
+		var e = jQuery.Event("keypress");
+		e.keyCode = 13;
+		$("#phrases-search").trigger(e);
+	})
+
 	// Search term on Enter press
 	$("#phrases-search").on('keypress', function(e) {
 		$('#phrases-search').popover('hide');

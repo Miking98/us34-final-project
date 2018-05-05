@@ -2,9 +2,12 @@ body {
 	padding-top:70px;
 	background: #f0f7ff !important;
 }
+a.underline {
+	text-decoration: underline;
+}
 #loading-spinner {
 	position: absolute;
-	top:30%;
+	top:40%;
 	left:45%;
 	display: none;
     background: #4a4949;
@@ -23,10 +26,24 @@ body {
 	padding:10px 0 10px 0;
 }
 
+.index-round-image {
+	height: 150px;
+	width: 150px;
+	object-fit: cover;
+	margin:10px 0 20px 0;
+}
+
 .state {
 	fill: none;
 	stroke: white;
 }
+#state-tooltip {
+	padding: 10px;
+	background-color: #000;
+	color: #FFF;
+	border-radius: 3px;
+}
+
 .county-hover {
 	fill: red !important;
 }
@@ -36,7 +53,6 @@ body {
 	color: #FFF;
 	border-radius: 3px;
 }
-
 /* UA DATA */
 .legend-axis line {
 	stroke: black;

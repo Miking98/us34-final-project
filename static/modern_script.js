@@ -45,84 +45,90 @@ $(document).ready(function() {
 	let colorScale = d3.scaleLinear()
 			  .range(["#ff0000","#bf42f4","#0000ff","grey"])
 			  .domain([0,1,2,3]);
+	let colorScale_modernFelon_domain = [1, 5, 10, 15, 20, 25, 30];
+	let colorScale_modernFelon = d3.scaleThreshold()
+		.range(['#ffe5e5', '#ffb2b2', '#ff7f7f', '#ff6666', '#ff3333', '#ff0000'])
+		// Red - .range(["#95ae8e", "#7f9e77", "#6a8e60", "#557e4a", "#406e33", "#2b5e1d"])
+		.domain(colorScale_modernFelon_domain);
 	let colorScale_civilWar_legendText = ['Confederate', 'Border State (Union)', 'Union', 'N/A'];
 	let colorScale_edu_legendText = ['State-wide law', 'Local choice', 'Forbidden', 'N/A'];
 	let colorScale_civilRights_legendText = ['Nay', 'Split', 'Yeah', 'N/A'];
 
-	function color_civilWar(value) {
-		if ($.inArray(value, confederate)>=0) {
-			// Confederate
+	function get_state_info(state, idx) {
+		if (idx == 1) {
+			// Lookup Confederate/Border/Union status
+			if ($.inArray(state, confederate)>=0) {
+				// Confederate
+				return "confederate";
+			}
+			else if ($.inArray(state, border)>=0) {
+				// Border
+				return "border";
+			}
+			else if ($.inArray(state, union)>=0) {
+				// Union
+				return "union";
+			}
+		}
+		for (var i = 0; i<data.length; i++) {
+			let value = data[i][0];
+			if (state == value) {
+				return data[i][idx];
+			}
+		}
+		return null;
+	}
+	function color_civilWar(state) {
+		let val = get_state_info(state, 1);
+		if (val == "confederate") {
 			return colorScale(0);
 		}
-		else if ($.inArray(value, border)>=0) {
-			// Border
+		else if (val == "border") {
 			return colorScale(1);
 		}
-		else if ($.inArray(value, union)>=0) {
-			// Union
+		else if (val == "union") {
 			return colorScale(2);
+		}
+		else {
+			return "grey";
+		}
+	}
+	function color_edu(state) {
+		let val = get_state_info(state, 2);
+		if (val == "Law") {
+			return colorScale(0);
+		}
+		else if (val == "Limited") {
+			return colorScale(1);
+		}
+		else if (val == "Forbidden") {
+			return colorScale(2);
+		}
+		else if (val == "None") {
+			return colorScale(3);
 		}
 		else {
 			return colorScale(3);
 		}
 	}
-	function color_edu(value) {
-		for (var i = 0; i<data.length; i++) {
-			let state = data[i][0];
-			if (state == value) {
-				// Found correct state
-				let val = data[i][2];
-				if (val == "Law") {
-					return colorScale(0);
-				}
-				else if (val == "Limited") {
-					return colorScale(1);
-				}
-				else if (val == "Forbidden") {
-					return colorScale(2);
-				}
-				else if (val == "None") {
-					return colorScale(3);
-				}
-				else {
-					return colorScale(3);
-				}
-				break;
-			}
+	function color_civilRights(state) {
+		let val = get_state_info(state, 4);
+		if (val == "Nay") {
+			return colorScale(0);
+		}
+		else if (val == "Yes") {
+			return colorScale(2);
+		}
+		else if (val == "Split") {
+			return colorScale(1);
+		}
+		else {
+			return colorScale(3);
 		}
 	}
-	function color_civilRights(value) {
-		for (var i = 0; i<data.length; i++) {
-			let state = data[i][0];
-			if (state == value) {
-				// Found correct state
-				let val = data[i][4];
-				if (val == "Nay") {
-					return colorScale(0);
-				}
-				else if (val == "Yes") {
-					return colorScale(2);
-				}
-				else if (val == "Split") {
-					return colorScale(1);
-				}
-				else {
-					return colorScale(3);
-				}
-				break;
-			}
-		}
-	}
-	function color_modernFelon(value) {
-		for (var i = 0; i<data.length; i++) {
-			let state = data[i][0];
-			if (state == value) {
-				// Found correct state
-				let val = data[i][3];
-				break;
-			}
-		}
-		
+	function color_modernFelon(state) {
+		let val = get_state_info(state, 3);
+		return colorScale_modernFelon(val);
 	}
 
 	var svg_width = 720,
@@ -142,22 +148,24 @@ $(document).ready(function() {
 	var g = svg.append("g")
 			.attr("class", "nation");
 
+	var defs = svg.append("defs");
+
+	defs.append("linearGradient")
+		.attr("id", "modern-felon-colorScale")
+		.attr("x1", "0%")
+		.attr("y1", "0%")
+		.attr("x2", "100%")
+		.attr("y2", "0%");
+
 	var tooltip = d3.select("body")
 		.append("div")
 		.style("position", "absolute")
 		.style("z-index", "10")
 		.style("visibility", "hidden")
 		.html(function() {
-			return '<div id="county-tooltip">'+	
-						'<strong>County: </strong><span id="county-tooltip-name"></span><br>'+
-						'<span id="county-tooltip-noInfo">No info</span>'+
-						'<div id="county-tooltip-info-container">'+
-							'<strong>Average age: </strong><span id="county-tooltip-averageAge">N/A</span><br>'+
-							//'<strong>Literacy rate: </strong><span id="county-tooltip-literacy">N/A</span><br>'+
-							'<strong>Average property value: </strong><span id="county-tooltip-averageProperty">N/A</span><br>'+
-							//'<strong>White: </strong><span id="county-tooltip-whitePercent">N/A</span><br>'+
-							//'<strong>Married: </strong><span id="county-tooltip-maritalStatus">N/A</span>'+
-						'</div>'+
+			return '<div id="state-tooltip">'+	
+						'<strong>State: </strong><span id="state-tooltip-name"></span><br>'+
+						'<strong>Info: </strong><span id="state-tooltip-info">No info</span>'+
 					'</div>';
 		});
 
@@ -173,9 +181,10 @@ $(document).ready(function() {
      			.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   	legend.append("rect")
-		  .attr("width", 18)
-		  .attr("height", 18)
-		  .style("fill", colorScale);
+			.attr("class", "modern-legend-rect")
+			.attr("width", 18)
+			.attr("height", 18)
+			.style("fill", colorScale);
 
   	legend.append("text")
 			.attr("class", "modern-legend-text")
@@ -187,10 +196,11 @@ $(document).ready(function() {
 
 	d3.json("https://s3.amazonaws.com/us34finalproject/us_states.json", function(us) {
 
-		svg.selectAll("path")
+		svg.selectAll(".modern-state-path")
 			.data(us.features)
 			.enter()
 			.append("path")
+			.attr("class", "modern-state-path")
 			.attr("d", path)
 			.style("stroke", "#fff")
 			.style("stroke-width", "1")
@@ -221,12 +231,23 @@ $(document).ready(function() {
 				}
 			})
 			.on('mouseover', function(d) {
-				d3.select("#selected-state").text(d.properties.name);
+				let state = d.properties.name;
+				let info = firstUpperCase(get_state_info(state, 1));
+				d3.select("#selected-state").text(state);
 				d3.select(this).classed("state-hover", true);
+				tooltip.select("#state-tooltip-name").text(state);
+				tooltip.select("#state-tooltip-info").text(info);
+				tooltip.style("visibility", "visible");
+			})
+			.on("mousemove", function(d) {
+				tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
 			})
 			.on("mouseout", function(d) {
 				d3.select("#selected-state").text("");
 				d3.select(this).classed("state-hover", false);
+				tooltip.select("#state-tooltip-name").text('');
+				tooltip.select("#state-tooltip-info").text('N/A');
+				tooltip.style("visibility", "hidden");
 			});
 	});
 
@@ -235,6 +256,7 @@ $(document).ready(function() {
 
 		let color_func = color_civilWar;
 		let color_legend = colorScale_civilWar_legendText;
+		let state_index = 1;
 		if (year == 0) {
 			// Civil War
 			color_func = color_civilWar;
@@ -244,34 +266,117 @@ $(document).ready(function() {
 			// 1954 education
 			color_func = color_edu;
 			color_legend = colorScale_edu_legendText;
+			state_index = 2;
 		} 
 		else if (year == 2) {
 			// 1964 civil rights bill
 			color_func = color_civilRights;
 			color_legend = colorScale_civilRights_legendText;
+			state_index = 4;
 		} 
 		else if (year == 3) {
 			// Modern felon disenfranchisement
 			color_func = color_modernFelon;
-			color_legend = color_modern_legendText;
+			state_index = 3;
 		}
 
-		svg.selectAll("path")
+		svg.selectAll(".modern-state-path")
 			.style("stroke", "#fff")
 			.style("stroke-width", "1")
 			.style("fill", function(d) {
 				// Get data value
+				console.log(d);
 				let state = d.properties.name;
 				return color_func(state);
+			})
+			.on('mouseover', function(d) {
+				let state = d.properties.name;
+				let info = firstUpperCase(get_state_info(state, state_index));
+				d3.select("#selected-state").text(state);
+				d3.select(this).classed("state-hover", true);
+				tooltip.select("#state-tooltip-name").text(state);
+				tooltip.select("#state-tooltip-info").text(info + (year == 3 ? '%' : ''));
+				tooltip.style("visibility", "visible");
+			})
+			.on("mousemove", function(d) {
+				tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+			})
+			.on("mouseout", function(d) {
+				d3.select("#selected-state").text("");
+				d3.select(this).classed("state-hover", false);
+				tooltip.select("#state-tooltip-name").text('');
+				tooltip.select("#state-tooltip-info").text('N/A');
+				tooltip.style("visibility", "hidden");
 			});
 
 	  	legend.selectAll(".modern-legend-text")
 	  		.remove();
 
+	  	legend.selectAll(".modern-legend-rect")
+	  		.remove();
+
 	  	if (year == 3) {
 	  		// Modern trends
+			//Color Legend container
+				var mapColorLegend = svg.append("g")
+					.attr("id", "modern-felon-legend")
+					.attr("y", 10)
+					.attr("x", 300)
+					.attr("transform", "translate(300,10)")
+
+				//Draw the Rectangle
+				mapColorLegend.append("rect")
+					.attr("id", "modern-felon-colorScaleBar")
+					.attr("x", 0)
+					.attr("y", 15)
+			    	.attr("width", 240)
+			    	.attr("height", 20)
+					.style("fill", "url(#modern-felon-colorScale)");
+					
+				//Append title
+				mapColorLegend.append("text")
+					.attr("id", "modern-felon-legendTitle")
+					.attr("x", -25)
+					.attr("y", 5)
+					.style("fill", "black")
+					.style("font-style", "italic")
+					.style("font-size", "14px")
+					.text("% of Voting-Age Blacks Disenfranchised by Felony Laws");
+
+				//Set scale for x-axis
+				var mapColorLegendScaleX = d3.scaleLinear()
+					.range([0, 240])
+					.domain([colorScale_modernFelon_domain[0], colorScale_modernFelon_domain[colorScale_modernFelon_domain.length-1]]);
+
+				//Define x-axis
+				var mapColorScaleGradientBar = d3.axisBottom()
+					.ticks(5)  //Set rough # of ticks
+					.scale(mapColorLegendScaleX);
+
+				//Set up X axis
+				mapColorLegend.append("g")
+					.attr("id", "modern-felon-legendTicks")
+					.attr("class", "legend-axis")
+					.attr("y", 35)
+					.attr("transform", "translate(0,35)")
+					.call(mapColorScaleGradientBar);
+
+				mapColorScaleGradientBar.scale(mapColorLegendScaleX)
+					.ticks(10);
+				d3.select("#modern-felon-legendTicks").call(mapColorScaleGradientBar);
+				d3.select("#modern-felon-colorScale").selectAll("stop")
+					.data( colorScale_modernFelon.range() )
+					.enter().append("stop")
+					.attr("offset", function(d,i) { return i/(colorScale_modernFelon.range().length-1); })
+					.attr("stop-color", function(d) { return d; });
 	  	}
 	  	else {
+	  		svg.select("#modern-felon-legend").remove();
+		  	legend.append("rect")
+	  			.attr("class", "modern-legend-rect")
+				.attr("width", 18)
+				.attr("height", 18)
+				.style("fill", colorScale);
 	  		legend.append("text")
 	  			.attr("class", "modern-legend-text")
 		  		.data(color_legend)
@@ -282,6 +387,11 @@ $(document).ready(function() {
 		}
 	}
 });
+
+function firstUpperCase(input) {
+    return input[0].toUpperCase()+input.substr(1);
+}
+
 
 function format_decimal(n) {
 	return Math.round(n*1000)/10;
