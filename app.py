@@ -17,7 +17,10 @@ login_manager.login_view = "login"
 
 # Flask-SQLAlchemy
 if os.environ.get('IS_HEROKU'):
-	app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+	uri = os.getenv("DATABASE_URL")  # or other relevant config var
+	if uri and uri.startswith("postgres://"):
+		uri = uri.replace("postgres://", "postgresql://", 1)
+	app.config['SQLALCHEMY_DATABASE_URI'] = uri
 else:
 	app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db.init_app(app)
