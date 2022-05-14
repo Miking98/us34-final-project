@@ -2,6 +2,7 @@ from flask import Flask, redirect, render_template, request
 import datetime
 import random
 from flask_login import LoginManager, login_required, login_user, logout_user
+import os
 
 from models import User, db
 
@@ -15,7 +16,10 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 
 # Flask-SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+if os.environ.get('IS_HEROKU'):
+	app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+else:
+	app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db.init_app(app)
 
 @login_manager.user_loader
