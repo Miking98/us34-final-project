@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="my-4">
+		<h1>Lottery</h1>
+        <p>You seem like a {{ random_name }} person. Let's hope it's your lucky day!</p>
+		<p>If one of your numbers matches the winning number, then you win.</p>
+        <h3>Winning Number</h3>
+        <p class="red">
+            <strong>{{ winning_num|default('N/A')}}</strong>
+        </p>
+        <h3>Your Numbers</h3>
+        <div>
+            {% if random_nums|length == 0 %}
+                None found :(
+            {% else %}
+                <ul>
+                    {% for num in random_nums %}
+                        {% if num == winning_num %}
+                            <li class="red"><strong>{{ num }}</strong></li>
+                        {% else %}
+                            <li>{{ num }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+	</div>
+{% endblock %}

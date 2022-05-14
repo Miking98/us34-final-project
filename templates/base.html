@@ -1,74 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 	<head>
-		<!-- Required meta tags -->
-	    <meta charset="utf-8">
-	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-		<title>USW 34 Data Project: Civil War</title>
-
-		<script type=text/javascript>
-			$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-		</script>
-
-		<!-- D3 -->
-		<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
-		<script src="https://d3js.org/topojson.v1.min.js"></script>
-		<script src="https://d3js.org/d3-queue.v2.min.js"></script>
-		<script src="https://d3js.org/d3-geo.v1.min.js"></script>
-		<script src="https://d3js.org/topojson.v1.min.js"></script>
-
-		<!-- jQuery -->
-		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+		<title>Stanford Splash</title>
 
 		<!-- Bootstrap -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
-		<link href="https://bootswatch.com/4/yeti/bootstrap.min.css" rel="stylesheet">
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
-
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 		<!-- Custom -->
-		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" >
-		<link href="{{ url_for('static', filename='spinner.css') }}" rel="stylesheet" >
-
+		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 	</head>
 
 	<body>
-		<div id="loading-spinner">
-			<div class="la-ball-beat la-2x">
-				<div></div>
-				<div></div>
-				<div></div>
-			</div>
-			<div class="text-center">
-				<span style="color: white;">Loading...</span><br>
-				<span style="color: white; font-size: 12px;">(This may take a minute)</span>
-			</div>
-		</div>
-		<div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+		<!-- Navigation -->
+		<div class="navbar navbar-expand-lg fixed-top bg-dark navbar-dark">
 			<div class="container">
-				<a href="/" class="navbar-brand">Home</a>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+				<a href="{{ url_for('index') }}" class="navbar-brand">
+					Home
+				</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="collapse navbar-collapse" id="navbarResponsive">
 					<ul class="navbar-nav">
 						<li class="nav-item">
-							<a class="nav-link" href="/union_recruits">Union White Recruits</a>
+							<a class="nav-link" href="{{ url_for('about') }}">
+								About
+							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="/letters">Letters</a>
+							<a class="nav-link" href="{{ url_for('lottery') }}">
+								Lottery
+							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="/modern_trends">Modern Trends</a>
+							<a class="nav-link" href="{{ url_for('feedback') }}">
+								Feedback
+							</a>
 						</li>
+					</ul>
+					<ul class="navbar-nav ms-auto">
+						{% if not current_user.is_authenticated  %}
+							<li class="nav-item">
+								<a class="nav-link" href="{{ url_for('login') }}">
+									Login
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="{{ url_for('register') }}">
+									Register
+								</a>
+							</li>
+						{% else %}
+							<li class="nav-item">
+								<a class="nav-link" href="{{ url_for('logout') }}">
+									Log out
+								</a>
+							</li>
+						{% endif %}
 					</ul>
 				</div>
 			</div>
 		</div>
-
+		
+		<!-- Content -->
 		<main role="main" class="container">
 			{% block content %}
 			{% endblock %}
@@ -76,11 +71,10 @@
 
 		<!--Footer-->
 		<footer id="footer" class="footer text-white text-center bg-primary">
-			<!--Copyright-->
-			USW 34 Final Project<br>
-			© 2018 Michael Wornow and Theo Walker
-			<!--/.Copyright-->
+			Copyright {{current_year}}
 		</footer>
-                      
+                 
+		<script src="{{ url_for('static', filename='script.js') }}" type="text/javascript"></script>
+		
 	</body>
 </html>

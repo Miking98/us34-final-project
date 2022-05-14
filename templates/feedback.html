@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="my-4">
+		<h1>Submit Your Feedback</h1>
+        {% if is_success %}
+            <div class="alert alert-success">
+                Success!
+            </div>
+        {% endif %}
+        {% if is_error %}
+            <div class="alert alert-danger">
+                Error - Invalid inputs
+            </div>
+        {% endif %}
+        <p>Splash prides itself on 100% customer satisfication. Please let us know how awesome your class was below.</p>
+        <form action="{{ url_for('feedback') }}" method="POST">
+            <div class="mb-3">
+                <label class="form-label">
+                    Email
+                </label>
+                <input type="email" class="form-control" name="email">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">
+                    Feedback
+                </label>
+                <textarea class="form-control" name="feedback" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                Submit
+            </button>
+        </form>
+	</div>
+{% endblock %}
