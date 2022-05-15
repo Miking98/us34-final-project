@@ -7,7 +7,7 @@ grpcio==1.10.0
 gunicorn==19.7.1
 Jinja2==2.10
 jsonschema==2.6.0
-nltk==3.4.5
+nltk==3.6.6
 numba==0.37.0
 numpy==1.14.0
 pandas==0.22.0
