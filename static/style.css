@@ -1,7 +1,143 @@
 body {
 	padding-top:70px;
-	background: #f0f7ff;
+	background: #f0f7ff !important;
 }
-.red {
-	color: red;
+a.underline {
+	text-decoration: underline;
+}
+#loading-spinner {
+	position: absolute;
+	top:40%;
+	left:45%;
+	display: none;
+    background: #4a4949;
+    z-index: 1000;
+    padding: 30px;
+    opacity: 0.9;
+    border-radius: 5px;
+}
+#loading-spinner .la-ball-atom {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+}
+#footer {
+	margin-top:40px;
+	padding:10px 0 10px 0;
+}
+
+.index-round-image {
+	height: 150px;
+	width: 150px;
+	object-fit: cover;
+	margin:10px 0 20px 0;
+}
+
+.state {
+	fill: none;
+	stroke: white;
+}
+#state-tooltip {
+	padding: 10px;
+	background-color: #000;
+	color: #FFF;
+	border-radius: 3px;
+}
+
+.county-hover {
+	fill: red !important;
+}
+#county-tooltip {
+	padding: 10px;
+	background-color: #000;
+	color: #FFF;
+	border-radius: 3px;
+}
+/* UA DATA */
+.legend-axis line {
+	stroke: black;
+}
+.legend-axis path {
+	stroke: black;
+}
+.legend-axis text {
+	fill: black;
+}
+
+
+
+/* LETTERS */
+#letters-tooltip {
+	padding: 10px;
+	background-color: #000;
+	color: #FFF;
+	border-radius: 3px;
+	font-size: 12px;
+}
+.x-axis path, .y-axis path,
+.x-axis line, .y-axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+.plot-dot {
+  stroke: #000;
+}
+.axis-label {
+	fill: black;
+	font-style:italic;
+	font-size:14px;
+}
+.x-axis .tick, .y-axis .tick {
+	fill: black;
+	stroke: black;
+}
+.plot-dot-hover {
+	fill: red !important;
+}
+#phrases-terms {
+	padding: 10px;
+	background: #fff;
+    max-height: 300px;
+    overflow-y: scroll;
+}
+.phrases-terms-empty {
+	opacity:0;
+}
+.phrases-terms-item:first-child {
+	border-top: 1px dashed #000;
+}
+.phrases-terms-item {
+	font-size: 16px;
+	color: #000;
+	padding-top: 5px;
+	border-bottom: 1px dashed #000;
+}
+.phrases-terms-item div {
+	display: inline-block;
+}
+.phrases-terms-item button {
+	float:right;
+	font-size: 13px;
+	padding: 2px 5px 2px 5px;
+}
+.phrases-terms-colorRect {
+	vertical-align: middle;
+}
+.phrases-terms-colorRect svg {
+	width: 25px;
+	height: 25px;
+}
+.phrases-terms-query {
+	padding-left: 8px;
+}
+#phrases-search-limit {
+	background: white;
+	padding:5px;
+}
+
+
+/* MODERN TRENDS */
+.state-hover {
+	fill: yellow !important;
 }

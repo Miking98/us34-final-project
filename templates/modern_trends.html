@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card border-danger">
+	<div class="card-header bg-danger text-white">
+		<h4>Motivating Question</h4>
+	</div>
+	<div class="card-body">
+		<p class="lead">What connections, if any, exist between state allegiance during the Civil War, Jim Crow segregation, political resistance to civil rights legislation, and modern day disenfranchisement of African-Americans?</p>
+	</div>
+</div>
+
+<br>
+
+<div class="card border-success">
+	<div class="card-header bg-success text-white">
+		<h2>Modern Trends</h2>
+	</div>
+	<div class="card-body">
+		<p>Selected state: <span id="selected-state"></span></p>
+		<div class="row">
+			<div class="col-md-8">
+				<div id="map-uadata">
+				</div>
+				<div id="map-colorScale">
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card bg-light">
+					<div class="card-header bg-warning text-white">
+						<h5>Change Map Year</h5>
+					</div>
+					<div class="card-body">
+						<div id="yearSlider-container" class="text-center">
+							<input id="yearSlider" type="range" min="0" max="3" value="0" step="1"/><br>
+							<span id="yearSlider-text">1860</span>
+						</div>
+					</div>
+					<div style="padding:0px 20px 20px 20px; font-size:12px;">
+						<strong>1860</strong> - Confederate/Union split<br>
+						<strong>1954</strong> - Pre-Brown v. Board of Education school segregation<br>
+						<strong>1964</strong> - Votes of Democratic Senators on 1964 Civil Rights Act<br>
+						<strong>2017</strong> - Percent of voting-age African-Americans disenfranchised due to felony
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br>
+
+<div class="card border-info">
+	<div class="card-header bg-info text-white">
+		<h4>Description of Dataset</h4>
+	</div>
+	<div class="card-body">
+		<p>Since the information conveyed in the above maps is less obscure than the other datasets we looked at, and is fairly common knowledge about historians, collecting the datasets for this section of the website was much easier than the others. The data for these maps was collected from the following sources:</p>
+		<ul>
+			<li><a href="vox.com">Vox</a></li>
+			<li><a href="https://www.nps.gov/civilwar/facts.htm">National Park Service</a></li>
+		</ul>
+	</div>
+</div>
+
+<br>
+
+<div class="card border-warning">
+	<div class="card-header bg-warning text-white">
+		<h4>Interesting Trends</h4>
+	</div>
+	<div class="card-body">
+		<p>A few interesting trends from this map were identified</p>
+		<ul>
+			<li>The maps partitionings are almost identical from one data set to the next across eras, especially in the heart of the former Confederacy, showing how attitudes regarding race and equality haven't changed that significantly since the conclusion of the Civil War</li>
+			<li>The percentage of African-Americans who have been disenfranchised due to felon disenfranchisement laws is highest in those states which were most invested in the original institution of slavery. These laws disproportionately affect African-Americans, illustrating how sometimes even neutral-sounding laws can be used to perpetuate institutional racism. As Lee Atwater admitted in his infamous 1981 interview on the Southern Strategy, though blatant racism "hurts you" in modern-day American, coded language and "abstract" policies that result in "blacks get[ting] hurt worse than whites" allowed Republican politicians to appeal to the same racist white voters that voted Democratic in the Jim Crow era</li>
+			<li>All the Confederacy had to do to win the Civil War was not lose to a foreign invader, and although its armies lost on the battlefield, charts like this show that the South was ultimately able to preserve its racist institutions and ways of life</li>
+
+
+		</ul>
+	</div>
+</div>
+
+<script src="{{ url_for('static', filename='modern_script.js') }}"></script>
+
+{% endblock %}

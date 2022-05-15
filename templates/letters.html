@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card border-danger">
+	<div class="card-header bg-danger text-white">
+		<h4>Motivating Question</h4>
+	</div>
+	<div class="card-body">
+		<p class="lead">Are trends in public sentiment during the Civil War captured in the letters written to and sent by soldiers?</p>
+	</div>
+</div>
+
+<br>
+
+<div class="card border-success">
+	<div class="card-header bg-success text-white">
+		<h2>Civil War Letters Analysis</h2>
+	</div>
+	<div class="card-body">
+		<div class="row">
+			<div class="col-md-8">
+				<div id="plot-ngramdata">
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card bg-warning text-white">
+					<div class="card-header">
+						<h5>Search for Phrases</h5>
+					</div>
+					<div class="card-body">
+
+						<div id="phrases-container">
+							<div class="form-group">
+								<div class="input-group">
+									<input id="phrases-search" type="text" class="form-control" placeholder="Enter a term or phrase" data-toggle="popover" data-placement="bottom" data-content="This term is not in the letters dataset.">
+									<div class="input-group-append">
+										<button id="phrases-search-goButton" class="btn btn-success" type="button">Go</button>
+									</div>
+								</div>
+							</div>
+
+							<p id="phrases-search-limit" style="display: none;" class="text-danger">ERROR: Max of 20 search terms allowed</p>
+
+							<div id="phrases-terms" class="phrases-terms-empty">
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<br>
+
+<div class="card border-info">
+	<div class="card-header bg-info text-white">
+		<h4>Description of Dataset</h4>
+	</div>
+	<div class="card-body">
+		<p>The key to this visual was finding a large dataset of letters written between 1860-65 by American citizens. The letters needed to be both transcribed into machine readable format (i.e. literal text rather than scanned images) and marked with a date so that we could plot the frequency of certain phrases over time.</p>
+		<p>We needed to compile multiple different databases in order to get enough letters so that we had enough data points to ground our analysis. For our visual, we ended up combining the following three archives of Civil War letters:
+		<ul>
+			<li><a href="http://www.soldierstudies.org/">Civil War Voices</a></li>
+			<li><a href="https://cwld.alexanderstreet.com/">The American Civil War: Letters and Diaries</a></li>
+			<li><a href="https://ehistory.osu.edu/books/official-records">The War of the Rebellion: Official Records of the Civil War</a></li>
+		</ul>
+		<p>Because none of these archives had a centralized repository of letters, however, we first needed to write several Python scripts to scrape each website, download, and properly format each letter with the metadata that we needed.</p>
+		<p>After we compiled all of the data into a standardized, machine-readable format, we then tokenized each letter with the <code>nltk</code> software package and stored the count of every ngram of size 1 and 2 found in the dataset. We then send these counts to the browser in a large JSON file, allowing the user to instantly search for any one-word or two-word phrase and plot the change in that phrase's frequency over time.</p>
+		<p>An issue that we quickly ran into was the fact that certain years had more letters than other years. If we simply counted the number of occurences of a phrase for each year and then plotted the results on the graph, this would obviously skew our results, for years with more letters written during them would naturally have more occurences of that phrase in absolute terms. Thus, to control for the different number of letters written each year, instead of counting the total number of occurences of a phrase and plotting that on the Y-Axis for each year, we calculated the percentage of letters that each phrase occured in.</p>
+	</div>
+</div>
+
+<br>
+
+<div class="card border-warning">
+	<div class="card-header bg-warning text-white">
+		<h4>Interesting Trends</h4>
+	</div>
+	<div class="card-body">
+		<p>The data visualization tool above allows users to search for any one-word or two-word phrases and generate their own insights as to how the course of the Civil War changed the frequency of that phrase's usage in the personal correspondence of soldiers and their families.</p>
+		<p>We specifically used our tool to examine a few key themes from class, including Faust's theory on how the violence of the war impact American spirituality (reflected by usage of the terms "God", "spirit", etc.), how Lincoln and his policies became focal points of the War (reflected in the terms "Lincoln", "emancipation", etc.), and other interesting questions raised during lecture.</p>
+		<p>A few of these interesting trends are noted below.</p>
+		<ul>
+			<li>The country’s shift in interpretation of God throughout the Civil War, from an omnipotent deity to a passive onlooker, is reflected in a steady decrease of frequency of the word “God” over the years, and a decrease in the use of the word "spirit" from 1863-5 when the violence of the war reached a fever pitch. Additionally, the usage of the term "hope" decreased in 1862 and 1864, but had a slight uptick in 1863 and 1865, reflecting the sentiments of the general population in terms of how soon they expected the tide of the war to turn.</li>
+			<li>The words “slavery” and “emancipation” have peaks in frequency at the beginning of 1863, reflecting the war’s transition from a unification war into a war to end slavery. Additionally, the issuance of Lincoln's Emancipation Proclamation at the beginning of 1863 after having debated it the previous year probably helped contribute to this spike in the use of the term "emancipation" between 1862-3.</li>
+			<li>The phrase “Lincoln” increases in frequency throughout the war, indicating increase interest in the President as he achieved his policies and with them permanently transformed the landscape of American society</li>
+			<li>The frequencies of the words “England” and “France,” both nations that had interests in an independent South, decline around 1863, indicating that the emancipation proclamation prevented those powers from getting involved</li>
+			<li>Searching for terms that refer to specific events during the war, such as “Gettysburg” and “Sumter,” reveal the expected spike in frequency around the event’s date, but also show the duration of conversation surrounding the event</li>
+			<li>Searching for figures who played a part in the war, like “Sherman” or “Scott,” reveals their rise to or fall from relevance</li>
+			<li>The frequency of the word “surrender” is high near the beginning of the war (reflecting the fact that many people on both sides expected the war to come to a quick conclusion), declines as the outcome of the war become more uncertain, and then rises again towards the end of the conflict as a Union victory becomes clear</li>
+			<li>State’s rights aren’t mentioned in ANY of the private correspondences in our letters dataset, affirming that the Civil War was truly about slavery and the partipants at the time realized it as well</li>
+		</ul>
+	</div>
+</div>
+
+<script src="{{ url_for('static', filename='letter_script.js') }}"></script>
+
+{% endblock %}
